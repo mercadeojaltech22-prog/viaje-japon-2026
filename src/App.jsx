@@ -110,7 +110,7 @@ const initialItinerary = [
     id: 'd11', date: '25-may', region: 'TOKIO', theme: 'blue', mainActivity: 'DÍA LIBRE y Despedida', 
     activities: [
       { id: 'a31', time: '10:00', name: 'Shopping Libre', notes: '🛍️ Recomendaciones: Nakano Broadway (Cosas retro) o Shimokitazawa (Vintage).' },
-      { id: 'a32', time: '20:00', name: 'Despedida Mauro y Julián', notes: '✈️ Ellos salen al aeropuerto. El resto del grupo se muda al Hotel Tokio 3 (Ueno).' }
+      { id: 'a32', time: '20:00', name: 'Despedida', notes: '✈️ Vuelo al aeropuerto. El resto del grupo se muda al Hotel Tokio 3 (Ueno).' }
     ] 
   },
   { 
@@ -196,13 +196,26 @@ export default function App() {
     await sync(itinerary, updated);
   };
 
+  // BOTÓN MÁGICO PARA FORZAR LA NUBE
+  const forceUpdateCloud = async () => {
+    if(window.confirm("¿Sobreescribir la base de datos de la nube con los textos súper detallados?")) {
+      await setDoc(doc(db, "viaje", "datos"), { itinerary: initialItinerary, checklist: initialChecklist });
+      alert("¡Nube actualizada! Los detalles están a salvo para ti y Mauro.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white text-slate-800 font-sans pb-10">
       <div className="sticky top-0 z-20 bg-white border-b border-slate-100 pt-safe">
         <div className="max-w-md mx-auto">
           <div className="px-5 py-4 flex items-center justify-between">
             <h1 className="text-xl font-black text-slate-900 tracking-tighter italic">🎌 JAPAN 2026</h1>
-            <span className="text-[10px] font-bold px-3 py-1 bg-green-50 text-green-600 rounded-full animate-pulse border border-green-100">☁️ Sincronizado</span>
+            <div className="flex gap-2">
+              <button onClick={forceUpdateCloud} className="text-[9px] font-bold px-3 py-1 bg-rose-100 text-rose-700 rounded-full animate-bounce border border-rose-200 shadow-sm active:scale-95">
+                🔄 FORZAR NUBE
+              </button>
+              <span className="text-[9px] font-bold px-3 py-1 bg-green-50 text-green-600 rounded-full animate-pulse border border-green-100">☁️ Sincronizado</span>
+            </div>
           </div>
           <div className="flex px-3 pb-2 justify-between">
             {[ { id: 'resumen', icon: Home, label: 'Info' }, { id: 'itinerario', icon: Map, label: 'Ruta' }, { id: 'reservas', icon: CheckSquare, label: 'Check' } ].map((item) => (
@@ -300,25 +313,4 @@ export default function App() {
         {activeTab === 'reservas' && (
           <div className="space-y-6 pb-24 animate-in fade-in duration-300">
             <h3 className="font-black text-slate-900 text-xl uppercase mb-4 italic">Checklist</h3>
-            <div className="space-y-2">
-              {checklist.map(item => (
-                <label key={item.id} className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-slate-100 rounded-[24px] cursor-pointer active:scale-95 transition-all">
-                  <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-slate-900 checked:bg-slate-900 transition-all" />
-                  <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 line-through' : 'text-slate-800'}`}>{item.text}</span>
-                </label>
-              ))}
-            </div>
-            
-            <div className="mt-8 p-5 bg-amber-50 rounded-[24px] border border-amber-100 flex gap-3 text-left">
-               <AlertTriangle className="w-6 h-6 text-amber-500 flex-shrink-0" />
-               <div>
-                  <p className="text-[10px] font-black uppercase text-amber-700 tracking-widest mb-1">Cuidado</p>
-                  <p className="text-xs font-medium text-amber-800 leading-relaxed">Shibuya Sky y Pokémon Café se agotan en horas. Reservar <strong>4 semanas antes</strong>.</p>
-               </div>
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
-  );
-}
+            <div
