@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getFirestore, doc, onSnapshot, setDoc } from "firebase/firestore";
 import { 
   Home, CalendarDays, Map, CheckSquare, Moon, Train, Ticket, 
-  ChevronDown, ChevronUp, Zap, ShoppingBag, AlertTriangle, BookOpen, Building, Lightbulb
+  ChevronDown, ChevronUp, Zap, ShoppingBag, AlertTriangle, BookOpen, Building, Lightbulb, MapPin
 } from 'lucide-react';
 
 // --- CONFIGURACIÓN FIREBASE ---
@@ -165,6 +165,18 @@ const initialChecklist = [
   { id: 'c_a6', category: 'atraccion', text: 'Tokyo Skytree', completed: false }
 ];
 
+// --- UBICACIONES PARA EL MAPA INTERACTIVO ---
+const mapLocations = [
+  { id: 'tokyo', name: 'Tokio', query: 'Tokyo, Japan', color: 'bg-blue-100 text-blue-800' },
+  { id: 'osaka', name: 'Osaka', query: 'Osaka, Japan', color: 'bg-emerald-100 text-emerald-800' },
+  { id: 'kyoto', name: 'Kioto', query: 'Kyoto, Japan', color: 'bg-emerald-100 text-emerald-800' },
+  { id: 'nara', name: 'Nara', query: 'Nara, Japan', color: 'bg-emerald-100 text-emerald-800' },
+  { id: 'kamakura', name: 'Kamakura', query: 'Kamakura, Japan', color: 'bg-rose-100 text-rose-800' },
+  { id: 'fuji', name: 'Monte Fuji', query: 'Mount Fuji, Japan', color: 'bg-rose-100 text-rose-800' },
+  { id: 'ghibli', name: 'Ghibli Park', query: 'Ghibli Park, Aichi, Japan', color: 'bg-rose-100 text-rose-800' },
+  { id: 'seoul', name: 'Seúl', query: 'Incheon International Airport, South Korea', color: 'bg-slate-200 text-slate-800' }
+];
+
 // COLORES PARA LAS FRANJITAS COMPLETAS
 const themeStyles = {
   blue: { bg: 'bg-blue-100', text: 'text-blue-900', pillBg: 'bg-blue-200', dot: 'bg-blue-500' },
@@ -177,6 +189,9 @@ export default function App() {
   const [itinerary, setItinerary] = useState(initialItinerary);
   const [checklist, setChecklist] = useState(initialChecklist);
   const [expandedDays, setExpandedDays] = useState([]);
+  
+  // ESTADO PARA EL MAPA
+  const [mapQuery, setMapQuery] = useState('Japan');
 
   useEffect(() => {
     const unsub = onSnapshot(doc(db, "viaje", "datos"), (docSnap) => {
@@ -199,7 +214,6 @@ export default function App() {
     await sync(itinerary, updated);
   };
 
-  // BOTÓN MÁGICO PARA FORZAR LA NUBE
   const forceUpdateCloud = async () => {
     if(window.confirm("¿Sobreescribir la base de datos de la nube con los nuevos enlaces integrados?")) {
       await setDoc(doc(db, "viaje", "datos"), { itinerary: initialItinerary, checklist: initialChecklist });
@@ -221,10 +235,11 @@ export default function App() {
             </div>
           </div>
           <div className="flex px-3 pb-2 justify-between">
-            {[ { id: 'resumen', icon: Home, label: 'Info' }, { id: 'itinerario', icon: Map, label: 'Ruta' }, { id: 'reservas', icon: CheckSquare, label: 'Check' } ].map((item) => (
-              <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center justify-center gap-1.5 py-3 w-24 rounded-[20px] transition-all duration-300 ${activeTab === item.id ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-50'}`}>
+            {/* NUEVA BARRA DE NAVEGACIÓN CON EL MAPA */}
+            {[ { id: 'resumen', icon: Home, label: 'Info' }, { id: 'mapa', icon: MapPin, label: 'Mapa' }, { id: 'itinerario', icon: Map, label: 'Ruta' }, { id: 'reservas', icon: CheckSquare, label: 'Check' } ].map((item) => (
+              <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center justify-center gap-1.5 py-3 w-20 rounded-[20px] transition-all duration-300 ${activeTab === item.id ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-50'}`}>
                 <item.icon className="w-5 h-5" />
-                <span className="text-[9px] font-black uppercase tracking-widest">{item.label}</span>
+                <span className="text-[8px] font-black uppercase tracking-widest">{item.label}</span>
               </button>
             ))}
           </div>
@@ -233,7 +248,7 @@ export default function App() {
 
       <main className="max-w-md mx-auto p-4 mt-2">
         
-        {/* INFO */}
+        {/* INFO (INTACTO) */}
         {activeTab === 'resumen' && (
           <div className="space-y-4 animate-in fade-in duration-300">
             <div className="grid grid-cols-2 gap-4">
@@ -275,7 +290,36 @@ export default function App() {
           </div>
         )}
 
-        {/* RUTA CON LAS FRANJITAS */}
+        {/* NUEVA PESTAÑA: MAPA INTERACTIVO */}
+        {activeTab === 'mapa' && (
+          <div className="space-y-4 animate-in fade-in duration-300 flex flex-col h-[650px]">
+            <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+              {mapLocations.map((loc) => (
+                <button 
+                  key={loc.id} 
+                  onClick={() => setMapQuery(loc.query)}
+                  className={`flex-shrink-0 px-4 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-tight transition-all active:scale-95 ${mapQuery === loc.query ? 'bg-slate-900 text-white shadow-md' : `${loc.color} hover:opacity-80`}`}
+                >
+                  📍 {loc.name}
+                </button>
+              ))}
+            </div>
+            
+            <div className="flex-1 rounded-[32px] overflow-hidden border border-slate-200 shadow-sm bg-slate-100 relative">
+              <iframe 
+                title="Mapa de Japón"
+                src={`https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=12&ie=UTF8&iwloc=&output=embed`}
+                className="absolute inset-0 w-full h-full border-0"
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+            <p className="text-[10px] text-center text-slate-400 font-bold uppercase tracking-widest italic pt-2">Toca los pines de arriba para viajar</p>
+          </div>
+        )}
+
+        {/* RUTA (INTACTO) */}
         {activeTab === 'itinerario' && (
           <div className="space-y-4 pb-10">
             {itinerary.map((day) => {
@@ -311,7 +355,6 @@ export default function App() {
                             {act.hours && <p className="text-[10px] font-bold text-slate-400 mt-1 tracking-tight">⏱️ {act.hours}</p>}
                             <p className="text-[12px] text-slate-600 font-medium leading-relaxed mt-2">{act.notes}</p>
                             
-                            {/* BOTÓN CON LINK INCORPORADO */}
                             {act.link && (
                               <a 
                                 href={act.link} 
@@ -334,11 +377,9 @@ export default function App() {
           </div>
         )}
 
-        {/* CHECK DIVIDIDO POR CATEGORÍAS */}
+        {/* CHECK (INTACTO) */}
         {activeTab === 'reservas' && (
           <div className="space-y-8 pb-24 animate-in fade-in duration-300">
-            
-            {/* SECCIÓN HOSPEDAJE */}
             <div className="bg-slate-50 rounded-[32px] p-6">
                <h3 className="font-black text-slate-900 text-sm uppercase mb-4 flex items-center gap-2"><Building className="w-5 h-5 text-indigo-500" /> Hospedajes</h3>
                <div className="space-y-2">
@@ -351,7 +392,6 @@ export default function App() {
                </div>
             </div>
 
-            {/* SECCIÓN TRANSPORTE */}
             <div className="bg-slate-50 rounded-[32px] p-6">
                <h3 className="font-black text-slate-900 text-sm uppercase mb-4 flex items-center gap-2"><Train className="w-5 h-5 text-rose-500" /> Transportes y Trámites</h3>
                <div className="space-y-2">
@@ -368,7 +408,6 @@ export default function App() {
                </div>
             </div>
 
-            {/* SECCIÓN ATRACCIONES */}
             <div className="bg-slate-50 rounded-[32px] p-6">
                <h3 className="font-black text-slate-900 text-sm uppercase mb-4 flex items-center gap-2"><Ticket className="w-5 h-5 text-emerald-500" /> Atracciones</h3>
                <div className="space-y-2">
