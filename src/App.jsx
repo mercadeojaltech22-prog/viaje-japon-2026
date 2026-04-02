@@ -342,4 +342,105 @@ export default function App() {
               
               return (
                 <div key={day.id} className="transition-all duration-300">
-                  <button onClick={() => setExpandedDays(prev => isExpanded ? prev.filter(i => i !== day.id) : [...prev, day.id])} className={
+                  <button onClick={() => setExpandedDays(prev => isExpanded ? prev.filter(i => i !== day.id) : [...prev, day.id])} className={`w-full flex items-center justify-between p-4 rounded-[24px] transition-all duration-300 ${isExpanded ? 'bg-slate-50 mb-2' : theme.bg}`}>
+                    <div className="flex items-center gap-4 text-left">
+                      <div className={`px-4 py-2 rounded-[16px] ${theme.pillBg} ${theme.text} text-[11px] font-black tracking-tight`}>{day.date}</div>
+                      <span className={`font-black text-[13px] ${theme.text} uppercase tracking-tighter`}>{day.region}</span>
+                    </div>
+                    {isExpanded ? <ChevronUp className={`w-5 h-5 ${theme.text} opacity-50`} /> : <ChevronDown className={`w-5 h-5 ${theme.text} opacity-50`} />}
+                  </button>
+                  
+                  {isExpanded && (
+                    <div className="px-4 pb-6 pt-2 animate-in slide-in-from-top-2">
+                      <div className="mb-6">
+                         <p className="text-[14px] font-black text-slate-800 italic">"{day.mainActivity}"</p>
+                      </div>
+                      
+                      <div className="space-y-0">
+                        {day.activities.map((act) => (
+                          <div key={act.id} className="relative pl-6 border-l-2 border-slate-100 ml-2 pb-6 last:pb-0 text-left">
+                            <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full ${theme.dot} border-[3px] border-white shadow-sm`} />
+                            
+                            <div className="mb-1">
+                              <span className={`text-[11px] font-black ${theme.text} uppercase tracking-tight block mb-0.5`}>{act.time}</span>
+                              <span className="font-black text-[13px] text-slate-800 leading-tight uppercase">{act.name}</span>
+                            </div>
+                            
+                            {act.hours && <p className="text-[10px] font-bold text-slate-400 mt-1 tracking-tight">⏱️ {act.hours}</p>}
+                            <p className="text-[12px] text-slate-600 font-medium leading-relaxed mt-2">{act.notes}</p>
+                            
+                            {act.link && (
+                              <a 
+                                href={act.link} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className={`inline-flex items-center gap-1 mt-3 text-[11px] font-black ${theme.text} ${theme.pillBg} px-4 py-2 rounded-xl hover:opacity-80 transition-all shadow-sm active:scale-95`}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {act.linkLabel} 🔗
+                              </a>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* CHECK (INTACTO) */}
+        {activeTab === 'reservas' && (
+          <div className="space-y-8 pb-24 animate-in fade-in duration-300">
+            <div className="bg-slate-50 rounded-[32px] p-6">
+               <h3 className="font-black text-slate-900 text-sm uppercase mb-4 flex items-center gap-2"><Building className="w-5 h-5 text-indigo-500" /> Hospedajes</h3>
+               <div className="space-y-2">
+                 {checklist.filter(i => i.category === 'hospedaje').map(item => (
+                   <label key={item.id} className="flex items-center gap-4 p-4 bg-white rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
+                     <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-indigo-600 checked:bg-indigo-600 transition-all" />
+                     <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'}`}>{item.text}</span>
+                   </label>
+                 ))}
+               </div>
+            </div>
+
+            <div className="bg-slate-50 rounded-[32px] p-6">
+               <h3 className="font-black text-slate-900 text-sm uppercase mb-4 flex items-center gap-2"><Train className="w-5 h-5 text-rose-500" /> Transportes y Trámites</h3>
+               <div className="space-y-2">
+                 {checklist.filter(i => i.category === 'transporte').map(item => (
+                   <label key={item.id} className="flex items-center gap-4 p-4 bg-white rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
+                     <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-rose-600 checked:bg-rose-600 transition-all" />
+                     <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'}`}>{item.text}</span>
+                   </label>
+                 ))}
+               </div>
+               <div className="mt-4 p-4 bg-rose-100/50 rounded-[20px] flex gap-3 text-left border border-rose-200">
+                  <AlertTriangle className="w-5 h-5 text-rose-500 flex-shrink-0" />
+                  <p className="text-[11px] font-medium text-rose-800 leading-relaxed"><strong>¡Atención!</strong> Los tickets de trenes bala (App SmartEX) y buses de larga distancia (Highway Bus al Fuji) se habilitan para comprar exactamente <strong>30 días antes</strong> de la fecha del viaje.</p>
+               </div>
+            </div>
+
+            <div className="bg-slate-50 rounded-[32px] p-6">
+               <h3 className="font-black text-slate-900 text-sm uppercase mb-4 flex items-center gap-2"><Ticket className="w-5 h-5 text-emerald-500" /> Atracciones</h3>
+               <div className="space-y-2">
+                 {checklist.filter(i => i.category === 'atraccion').map(item => (
+                   <label key={item.id} className="flex items-center gap-4 p-4 bg-white rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
+                     <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-emerald-600 checked:bg-emerald-600 transition-all" />
+                     <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'}`}>{item.text}</span>
+                   </label>
+                 ))}
+               </div>
+               <div className="mt-4 p-4 bg-amber-50 rounded-[20px] flex gap-3 text-left border border-amber-200">
+                  <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                  <p className="text-[11px] font-medium text-amber-800 leading-relaxed"><strong>Advertencia Nivel Extremo:</strong> Las reservas para Shibuya Sky y Pokémon Café vuelan en minutos. Pongan una alarma <strong>4 semanas antes a las 6:00 PM (hora de Japón)</strong>.</p>
+               </div>
+            </div>
+
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
