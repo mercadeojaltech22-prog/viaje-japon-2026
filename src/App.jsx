@@ -313,4 +313,25 @@ export default function App() {
         {activeTab === 'reservas' && (
           <div className="space-y-6 pb-24 animate-in fade-in duration-300">
             <h3 className="font-black text-slate-900 text-xl uppercase mb-4 italic">Checklist</h3>
-            <div
+            <div className="space-y-2">
+              {checklist.map(item => (
+                <label key={item.id} className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-slate-100 rounded-[24px] cursor-pointer active:scale-95 transition-all">
+                  <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-slate-900 checked:bg-slate-900 transition-all" />
+                  <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 line-through' : 'text-slate-800'}`}>{item.text}</span>
+                </label>
+              ))}
+            </div>
+            
+            <div className="mt-8 p-5 bg-amber-50 rounded-[24px] border border-amber-100 flex gap-3 text-left">
+               <AlertTriangle className="w-6 h-6 text-amber-500 flex-shrink-0" />
+               <div>
+                  <p className="text-[10px] font-black uppercase text-amber-700 tracking-widest mb-1">Cuidado</p>
+                  <p className="text-xs font-medium text-amber-800 leading-relaxed">Shibuya Sky y Pokémon Café se agotan en horas. Reservar <strong>4 semanas antes</strong>.</p>
+               </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
