@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getFirestore, doc, onSnapshot, setDoc } from "firebase/firestore";
 import { 
   Home, CalendarDays, Map, CheckSquare, Moon, Train, Ticket, 
-  ChevronDown, ChevronUp, Zap, ShoppingBag, AlertTriangle, BookOpen
+  ChevronDown, ChevronUp, Zap, ShoppingBag, AlertTriangle, BookOpen, Building, Lightbulb
 } from 'lucide-react';
 
 // --- CONFIGURACIÓN FIREBASE ---
@@ -19,7 +19,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- ITINERARIO MAESTRO (CON FRANJAS DE COLOR, TONO GRUPAL Y 100% DETALLADO) ---
+// --- ITINERARIO MAESTRO ---
 const initialItinerary = [
   { 
     id: 'd_v1', date: '13-may', region: 'VUELO IDA', theme: 'blue', mainActivity: 'Salida MDE → MEX', 
@@ -143,17 +143,20 @@ const initialItinerary = [
   }
 ];
 
-// --- LISTA DE CHEQUEO ---
+// --- LISTA DE CHEQUEO ACTUALIZADA ---
 const initialChecklist = [
-  { id: 'c_v1', category: 'transporte', text: 'Vuelos Ida: MDE-MEX-NRT', completed: true },
-  { id: 'c_v2', category: 'transporte', text: 'Vuelos Regreso: NRT-ICN-MEX-MDE', completed: true },
-  { id: 'c_h1', category: 'hospedaje', text: 'Hotel Tokio 1 (15 Mayo)', completed: true },
-  { id: 'c_h2', category: 'hospedaje', text: 'Hotel Osaka (16-23 Mayo)', completed: true },
-  { id: 'c_h3', category: 'hospedaje', text: 'Hotel Tokio 2 (23-25 Mayo)', completed: true },
-  { id: 'c_h4', category: 'hospedaje', text: 'Hotel Tokio 3 (25-28 Mayo)', completed: true },
+  { id: 'c_h1', category: 'hospedaje', text: 'Hotel Tokio 1 (Ueno) - 15 Mayo', completed: true },
+  { id: 'c_h2', category: 'hospedaje', text: 'Hotel Osaka (Namba) - 16-23 Mayo', completed: true },
+  { id: 'c_h3', category: 'hospedaje', text: 'Hotel Tokio 2 (Ueno) - 23-25 Mayo', completed: true },
+  { id: 'c_h4', category: 'hospedaje', text: 'Hotel Tokio 3 (Ueno) - 25-28 Mayo', completed: true },
+  
+  { id: 'c_v1', category: 'transporte', text: 'Vuelos Ida (MDE-MEX-NRT)', completed: true },
+  { id: 'c_v2', category: 'transporte', text: 'Vuelos Regreso (NRT-ICN-MEX-MDE)', completed: true },
   { id: 'c_t1', category: 'transporte', text: 'Shinkansen: Tokio → Osaka', completed: false },
   { id: 'c_t2', category: 'transporte', text: 'Bus Highway: Kawaguchiko → Shinjuku', completed: false },
+  { id: 'c_t4', category: 'transporte', text: 'Tren Narita Express o Keisei Skyliner', completed: false },
   { id: 'c_t3', category: 'transporte', text: 'Permiso K-ETA (Corea del Sur)', completed: false },
+  
   { id: 'c_a1', category: 'atraccion', text: 'Ghibli Park - OK', completed: true },
   { id: 'c_a2', category: 'atraccion', text: 'Universal Studios - OK', completed: true },
   { id: 'c_a3', category: 'atraccion', text: 'Shibuya Sky', completed: false },
@@ -198,9 +201,9 @@ export default function App() {
 
   // BOTÓN MÁGICO PARA FORZAR LA NUBE
   const forceUpdateCloud = async () => {
-    if(window.confirm("¿Sobreescribir la base de datos de la nube con los textos súper detallados?")) {
+    if(window.confirm("¿Sobreescribir la base de datos de la nube con los nuevos tips y el checklist dividido?")) {
       await setDoc(doc(db, "viaje", "datos"), { itinerary: initialItinerary, checklist: initialChecklist });
-      alert("¡Nube actualizada! Los detalles están a salvo para ti y Mauro.");
+      alert("¡Nube actualizada! La nueva estructura está a salvo.");
     }
   };
 
@@ -246,17 +249,28 @@ export default function App() {
               </div>
             </div>
 
+            {/* NUEVO BLOQUE DE TIPS DE SUPERVIVENCIA */}
+            <div className="bg-rose-50 rounded-[28px] p-6 border border-rose-100">
+               <h3 className="font-black text-base mb-4 text-rose-900 flex items-center gap-2"><Lightbulb className="w-5 h-5" /> Tips de Supervivencia</h3>
+               <ul className="text-xs text-rose-800 space-y-3 font-medium">
+                 <li>• <strong>Maletas (Yamato Takkyubin):</strong> Viajen ligeros en el Shinkansen. Es súper recomendado enviar las maletas grandes desde el hotel de Tokio al de Osaka un día antes (aprox ¥2500).</li>
+                 <li>• <strong>Suica en el Celular:</strong> Si tienen iPhone, agreguen la tarjeta Suica a su Apple Wallet desde su país. Se recarga en 2 segundos con Apple Pay y los salva de hacer filas en las máquinas de metro.</li>
+                 <li>• <strong>Cultura de Basura:</strong> En Japón no se come caminando por la calle y es casi imposible encontrar basureros públicos. Lleven siempre una bolsita en la mochila para guardar sus empaques.</li>
+                 <li>• <strong>Compras Tax-Free:</strong> Lleven su pasaporte físico (no foto) siempre encima. En compras mayores a ¥5,000 en la mayoría de tiendas grandes, les descuentan el 10% de impuestos al pagar.</li>
+               </ul>
+            </div>
+
             <div className="bg-indigo-50 rounded-[28px] p-6 border border-indigo-100">
                <h3 className="font-black text-base mb-3 text-indigo-900 flex items-center gap-2"><BookOpen className="w-5 h-5" /> Goshuincho Tip</h3>
-               <p className="text-xs text-indigo-800 leading-relaxed font-medium">Comprar el libro de sellos (Goshuincho) en el Templo Senso-ji. En cada templo los monjes harán una caligrafía única a mano por ¥300-¥500. ⛩️</p>
+               <p className="text-xs text-indigo-800 leading-relaxed font-medium">Comprar el libro de sellos (Goshuincho) el primer día en el Templo Senso-ji. En cada templo o santuario, los monjes harán una caligrafía única a mano por ¥300-¥500. Es el recuerdo más lindo del viaje. ⛩️</p>
             </div>
 
             <div className="bg-emerald-50 rounded-[28px] p-6 border border-emerald-100">
                <h3 className="font-black text-base mb-4 text-emerald-900 flex items-center gap-2"><ShoppingBag className="w-5 h-5" /> Compras Rápidas</h3>
                <ul className="text-xs text-emerald-800 space-y-3 font-medium">
-                 <li>• <strong>Yamashiroya (Ueno):</strong> 6 pisos de juguetes y casitas miniatura.</li>
-                 <li>• <strong>Don Quijote:</strong> Abre 24h. Ideal para KitKats raros y snacks.</li>
-                 <li>• <strong>Uniqlo (Ginza):</strong> 12 pisos de ropa básica barata.</li>
+                 <li>• <strong>Yamashiroya (Ueno):</strong> 6 pisos inmensos de juguetes, Ghibli y casitas en miniatura japonesas.</li>
+                 <li>• <strong>Don Quijote (Donki):</strong> La cadena que abre 24h. Ideal para comprar KitKats raros de matcha y souvenirs a las 11 de la noche.</li>
+                 <li>• <strong>Uniqlo (Ginza):</strong> 12 pisos enteros de ropa. El más grande del mundo.</li>
                </ul>
             </div>
           </div>
@@ -271,7 +285,6 @@ export default function App() {
               
               return (
                 <div key={day.id} className="transition-all duration-300">
-                  {/* FRANJA DE COLOR COMPLETA AQUÍ */}
                   <button onClick={() => setExpandedDays(prev => isExpanded ? prev.filter(i => i !== day.id) : [...prev, day.id])} className={`w-full flex items-center justify-between p-4 rounded-[24px] transition-all duration-300 ${isExpanded ? 'bg-slate-50 mb-2' : theme.bg}`}>
                     <div className="flex items-center gap-4 text-left">
                       <div className={`px-4 py-2 rounded-[16px] ${theme.pillBg} ${theme.text} text-[11px] font-black tracking-tight`}>{day.date}</div>
@@ -309,26 +322,57 @@ export default function App() {
           </div>
         )}
 
-        {/* CHECK */}
+        {/* CHECK DIVIDIDO POR CATEGORÍAS */}
         {activeTab === 'reservas' && (
-          <div className="space-y-6 pb-24 animate-in fade-in duration-300">
-            <h3 className="font-black text-slate-900 text-xl uppercase mb-4 italic">Checklist</h3>
-            <div className="space-y-2">
-              {checklist.map(item => (
-                <label key={item.id} className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-slate-100 rounded-[24px] cursor-pointer active:scale-95 transition-all">
-                  <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-slate-900 checked:bg-slate-900 transition-all" />
-                  <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 line-through' : 'text-slate-800'}`}>{item.text}</span>
-                </label>
-              ))}
-            </div>
+          <div className="space-y-8 pb-24 animate-in fade-in duration-300">
             
-            <div className="mt-8 p-5 bg-amber-50 rounded-[24px] border border-amber-100 flex gap-3 text-left">
-               <AlertTriangle className="w-6 h-6 text-amber-500 flex-shrink-0" />
-               <div>
-                  <p className="text-[10px] font-black uppercase text-amber-700 tracking-widest mb-1">Cuidado</p>
-                  <p className="text-xs font-medium text-amber-800 leading-relaxed">Shibuya Sky y Pokémon Café se agotan en horas. Reservar <strong>4 semanas antes</strong>.</p>
+            {/* SECCIÓN HOSPEDAJE */}
+            <div className="bg-slate-50 rounded-[32px] p-6">
+               <h3 className="font-black text-slate-900 text-sm uppercase mb-4 flex items-center gap-2"><Building className="w-5 h-5 text-indigo-500" /> Hospedajes</h3>
+               <div className="space-y-2">
+                 {checklist.filter(i => i.category === 'hospedaje').map(item => (
+                   <label key={item.id} className="flex items-center gap-4 p-4 bg-white rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
+                     <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-indigo-600 checked:bg-indigo-600 transition-all" />
+                     <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'}`}>{item.text}</span>
+                   </label>
+                 ))}
                </div>
             </div>
+
+            {/* SECCIÓN TRANSPORTE */}
+            <div className="bg-slate-50 rounded-[32px] p-6">
+               <h3 className="font-black text-slate-900 text-sm uppercase mb-4 flex items-center gap-2"><Train className="w-5 h-5 text-rose-500" /> Transportes y Trámites</h3>
+               <div className="space-y-2">
+                 {checklist.filter(i => i.category === 'transporte').map(item => (
+                   <label key={item.id} className="flex items-center gap-4 p-4 bg-white rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
+                     <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-rose-600 checked:bg-rose-600 transition-all" />
+                     <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'}`}>{item.text}</span>
+                   </label>
+                 ))}
+               </div>
+               <div className="mt-4 p-4 bg-rose-100/50 rounded-[20px] flex gap-3 text-left border border-rose-200">
+                  <AlertTriangle className="w-5 h-5 text-rose-500 flex-shrink-0" />
+                  <p className="text-[11px] font-medium text-rose-800 leading-relaxed"><strong>¡Atención!</strong> Los tickets de trenes bala (App SmartEX) y buses de larga distancia (Highway Bus al Fuji) se habilitan para comprar exactamente <strong>30 días antes</strong> de la fecha del viaje.</p>
+               </div>
+            </div>
+
+            {/* SECCIÓN ATRACCIONES */}
+            <div className="bg-slate-50 rounded-[32px] p-6">
+               <h3 className="font-black text-slate-900 text-sm uppercase mb-4 flex items-center gap-2"><Ticket className="w-5 h-5 text-emerald-500" /> Atracciones</h3>
+               <div className="space-y-2">
+                 {checklist.filter(i => i.category === 'atraccion').map(item => (
+                   <label key={item.id} className="flex items-center gap-4 p-4 bg-white rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
+                     <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-emerald-600 checked:bg-emerald-600 transition-all" />
+                     <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'}`}>{item.text}</span>
+                   </label>
+                 ))}
+               </div>
+               <div className="mt-4 p-4 bg-amber-50 rounded-[20px] flex gap-3 text-left border border-amber-200">
+                  <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                  <p className="text-[11px] font-medium text-amber-800 leading-relaxed"><strong>Advertencia Nivel Extremo:</strong> Las reservas para Shibuya Sky y Pokémon Café vuelan en minutos. Pongan una alarma <strong>4 semanas antes a las 6:00 PM (hora de Japón)</strong>.</p>
+               </div>
+            </div>
+
           </div>
         )}
       </main>
