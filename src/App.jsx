@@ -24,7 +24,7 @@ const initialItinerary = [
   { 
     id: 'd_v1', date: '13-may', region: 'VUELO IDA', theme: 'blue', mainActivity: 'Salida MDE → MEX', 
     activities: [
-      { id: 'a_v1', time: '01:00', name: 'Salida MDE → MEX', notes: '✈️ Llegada 04:35 AM. ⏱️ ESCALA: 17h 40m. 🇲🇽 LOGÍSTICA: Es obligatorio hacer migración en México si se desea salir a conocer. Recomendación: Salir a desayunar tacos al Centro Histórico.' },
+      { id: 'a_v1', time: '01:00', name: 'Salida MDE → MEX', notes: '✈️ Llegada 04:35 AM. ⏱️ ESCALA: 17h 40m. 🇲🇽 LOGÍSTICA: Es obligatorio hacer pre-registro y migración en México si se desea salir a conocer. Recomendación: Salir a desayunar tacos al Centro Histórico.', link: 'https://www.inm.gob.mx/spublic/portal/inmex.html', linkLabel: '📝 Llenar Pre-registro (México)' },
       { id: 'a_v2', time: '22:15', name: 'MEX → NRT', notes: '✈️ Tramo largo hacia Tokio. Estar de vuelta en el aeropuerto 3 horas antes.' }
     ] 
   },
@@ -37,7 +37,7 @@ const initialItinerary = [
   { 
     id: 'd1', date: '15-may', region: 'TOKIO', theme: 'blue', mainActivity: 'Aterrizaje + Ueno + Asakusa', 
     activities: [
-      { id: 'a1', time: '06:30', name: 'Aterrizaje Narita (NRT)', notes: 'Pasar migración (Mostrar QR de Visit Japan Web). Recoger Suica/Pasmo y activar eSIM. Dejar maletas en hotel.' },
+      { id: 'a1', time: '06:30', name: 'Aterrizaje Narita (NRT)', notes: 'Pasar migración (Mostrar QR de Visit Japan Web). Recoger Suica/Pasmo y activar eSIM. Dejar maletas en hotel.', link: 'https://www.vjw.digital.go.jp/', linkLabel: '🛂 Llenar Visit Japan Web' },
       { id: 'a3', time: '13:00', name: 'Templo Senso-ji', hours: 'Abre 6:00 - Cierra 17:00', notes: '⛩️ Comprar el "Goshuincho" (Libro de sellos). En cada templo pondrán una caligrafía única. La calle Nakamise (comida) cierra a las 17:00.' },
       { id: 'a4', time: '17:30', name: 'Tokyo Skytree', hours: 'Abre 10:00 - Cierra 21:00', notes: '🎟️ Reserva obligatoria. Subir para el atardecer.' }
     ] 
@@ -131,7 +131,7 @@ const initialItinerary = [
     activities: [
       { id: 'a35b', time: '09:00', name: 'Compras última hora (Ueno)', hours: 'Abre 11:00 AM', notes: '🛍️ Aprovechar la mañana para visitar Yamashiroya (6 pisos de juguetes y kits de casas en miniatura).' },
       { id: 'a36', time: '16:00', name: 'Salida a Narita (NRT)', notes: '🚆 Tren Keisei Skyliner. Vuelo a Seúl a las 20:55.' },
-      { id: 'a37', time: '23:25', name: 'Llegada a Seúl (ICN)', notes: '🇰🇷 ⏱️ ESCALA NOCTURNA. ⚠️ CRÍTICO: Si se desea salir del aeropuerto a la ciudad, es obligatorio tramitar el permiso K-ETA por internet semanas antes. Si no, dormir en el hotel cápsula Darakhyu dentro de la terminal.' }
+      { id: 'a37', time: '23:25', name: 'Llegada a Seúl (ICN)', notes: '🇰🇷 ⏱️ ESCALA NOCTURNA. ⚠️ CRÍTICO: Si se desea salir del aeropuerto a la ciudad, es obligatorio tramitar el permiso K-ETA por internet semanas antes. Si no, dormir en el hotel cápsula Darakhyu dentro de la terminal.', link: 'https://www.k-eta.go.kr/', linkLabel: '🇰🇷 Tramitar K-ETA Oficial' }
     ] 
   },
   { 
@@ -201,9 +201,9 @@ export default function App() {
 
   // BOTÓN MÁGICO PARA FORZAR LA NUBE
   const forceUpdateCloud = async () => {
-    if(window.confirm("¿Sobreescribir la base de datos de la nube con los nuevos tips y el checklist dividido?")) {
+    if(window.confirm("¿Sobreescribir la base de datos de la nube con los nuevos enlaces integrados?")) {
       await setDoc(doc(db, "viaje", "datos"), { itinerary: initialItinerary, checklist: initialChecklist });
-      alert("¡Nube actualizada! La nueva estructura está a salvo.");
+      alert("¡Nube actualizada! Los links oficiales están listos para usarse.");
     }
   };
 
@@ -249,7 +249,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* NUEVO BLOQUE DE TIPS DE SUPERVIVENCIA */}
             <div className="bg-rose-50 rounded-[28px] p-6 border border-rose-100">
                <h3 className="font-black text-base mb-4 text-rose-900 flex items-center gap-2"><Lightbulb className="w-5 h-5" /> Tips de Supervivencia</h3>
                <ul className="text-xs text-rose-800 space-y-3 font-medium">
@@ -311,6 +310,19 @@ export default function App() {
                             
                             {act.hours && <p className="text-[10px] font-bold text-slate-400 mt-1 tracking-tight">⏱️ {act.hours}</p>}
                             <p className="text-[12px] text-slate-600 font-medium leading-relaxed mt-2">{act.notes}</p>
+                            
+                            {/* BOTÓN CON LINK INCORPORADO */}
+                            {act.link && (
+                              <a 
+                                href={act.link} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className={`inline-flex items-center gap-1 mt-3 text-[11px] font-black ${theme.text} ${theme.pillBg} px-4 py-2 rounded-xl hover:opacity-80 transition-all shadow-sm active:scale-95`}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {act.linkLabel} 🔗
+                              </a>
+                            )}
                           </div>
                         ))}
                       </div>
