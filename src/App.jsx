@@ -19,10 +19,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- ITINERARIO MAESTRO ---
+// --- ITINERARIO MAESTRO CON RUTAS GPS INYECTADAS ---
 const initialItinerary = [
   { 
     id: 'd_v1', date: '13-may', region: 'VUELO IDA', theme: 'blue', mainActivity: 'Salida MDE → MEX', 
+    routeQuery: 'saddr=Jose+Maria+Cordova+International+Airport&daddr=Mexico+City+International+Airport+to:Narita+International+Airport',
     activities: [
       { id: 'a_v1', time: '01:00', name: 'Salida MDE → MEX', notes: '✈️ Llegada 04:35 AM. ⏱️ ESCALA: 17h 40m. 🇲🇽 LOGÍSTICA: Es obligatorio hacer pre-registro y migración en México si se desea salir a conocer. Recomendación: Salir a desayunar tacos al Centro Histórico.', link: 'https://www.inm.gob.mx/spublic/portal/inmex.html', linkLabel: '📝 Llenar Pre-registro (México)' },
       { id: 'a_v2', time: '22:15', name: 'MEX → NRT', notes: '✈️ Tramo largo hacia Tokio. Estar de vuelta en el aeropuerto 3 horas antes.' }
@@ -30,12 +31,14 @@ const initialItinerary = [
   },
   { 
     id: 'd_v2', date: '14-may', region: 'EN TRÁNSITO', theme: 'blue', mainActivity: 'Cruce del Pacífico', 
+    routeQuery: 'q=Pacific+Ocean',
     activities: [
       { id: 'a_v3', time: '12:00', name: 'Día en el aire', notes: '✈️ Cruzando la línea internacional de fecha. Tratar de ajustar el sueño al horario de Japón.' }
     ] 
   },
   { 
     id: 'd1', date: '15-may', region: 'TOKIO', theme: 'blue', mainActivity: 'Aterrizaje + Ueno + Asakusa', 
+    routeQuery: 'saddr=Narita+International+Airport&daddr=Senso-ji,+Tokyo+to:Tokyo+Skytree',
     activities: [
       { id: 'a1', time: '06:30', name: 'Aterrizaje Narita (NRT)', notes: 'Pasar migración (Mostrar QR de Visit Japan Web). Recoger Suica/Pasmo y activar eSIM. Dejar maletas en hotel.', link: 'https://www.vjw.digital.go.jp/', linkLabel: '🛂 Llenar Visit Japan Web' },
       { id: 'a3', time: '13:00', name: 'Templo Senso-ji', hours: 'Abre 6:00 - Cierra 17:00', notes: '⛩️ Comprar el "Goshuincho" (Libro de sellos). En cada templo pondrán una caligrafía única. La calle Nakamise (comida) cierra a las 17:00.' },
@@ -44,6 +47,7 @@ const initialItinerary = [
   },
   { 
     id: 'd2', date: '16-may', region: 'TOKIO → OSAKA', theme: 'blue', mainActivity: 'Shibuya + Shinkansen', 
+    routeQuery: 'saddr=Shibuya+Crossing&daddr=Shibuya+Sky+to:Tokyo+Station+to:Shin-Osaka+Station',
     activities: [
       { id: 'a5', time: '09:00', name: 'Shibuya Crossing', notes: 'Cruce peatonal más famoso y foto con Hachiko.' },
       { id: 'a5b', time: '10:30', name: 'Shibuya Sky', hours: 'Abre 10:00 - Cierra 22:30', notes: '🎟️ RESERVA OBLIGATORIA (Hacerla 4 semanas antes). Vista panorámica al aire libre.' },
@@ -52,24 +56,28 @@ const initialItinerary = [
   },
   { 
     id: 'd3', date: '17-may', region: 'NAGOYA / OSAKA', theme: 'rose', mainActivity: 'Ghibli Park', 
+    routeQuery: 'saddr=Shin-Osaka+Station&daddr=Ghibli+Park,+Aichi+to:Dotonbori,+Osaka',
     activities: [
       { id: 'a11', time: '10:00', name: 'Ghibli Park', hours: 'Abre 10:00 - Cierra 17:00', notes: '🎟️ CONFIRMADO. 🛍️ La tienda "Adventurous Spirit" tiene mercancía exclusiva que no venden en Tokio.' }
     ] 
   },
   { 
     id: 'd4', date: '18-may', region: 'OSAKA', theme: 'emerald', mainActivity: 'Universal Studios Japan', 
+    routeQuery: 'saddr=Namba+Station,+Osaka&daddr=Universal+Studios+Japan',
     activities: [
       { id: 'a13', time: '08:00', name: 'USJ', hours: 'Varia (~8:00 - 21:00)', notes: '🎟️ CONFIRMADO. Apenas se pase la puerta de entrada, usar la app de USJ para sacar el "Timed Entry Ticket" de Nintendo.' }
     ] 
   },
   { 
     id: 'd5', date: '19-may', region: 'NARA', theme: 'emerald', mainActivity: 'Ciervos y Templos', 
+    routeQuery: 'saddr=Namba+Station,+Osaka&daddr=Todai-ji,+Nara',
     activities: [
       { id: 'a14', time: '09:30', name: 'Templo Todai-ji', hours: 'Abre 7:30 - Cierra 17:30', notes: '🦌 Comprar galletas oficiales para los ciervos. El Buda de bronce adentro es gigante.' }
     ] 
   },
   { 
     id: 'd6', date: '20-may', region: 'KIOTO SUR', theme: 'emerald', mainActivity: 'Fushimi Inari + Calles Tradicionales', 
+    routeQuery: 'saddr=Namba+Station,+Osaka&daddr=Fushimi+Inari+Taisha+to:Ninenzaka,+Kyoto+to:Gion,+Kyoto',
     activities: [
       { id: 'a15', time: '07:00', name: 'Fushimi Inari', hours: 'Abierto 24 horas', notes: '⛩️ Subir temprano hasta el primer mirador para tomar fotos sin tanta gente.' },
       { id: 'a17', time: '14:30', name: 'Ninenzaka y Sannenzaka', notes: 'Caminar por las calles de madera. ☕ Buscar el Starbucks escondido en una casa tradicional.' }
@@ -77,6 +85,7 @@ const initialItinerary = [
   },
   { 
     id: 'd7', date: '21-may', region: 'KIOTO NORTE', theme: 'emerald', mainActivity: 'Pabellón Dorado', 
+    routeQuery: 'saddr=Namba+Station,+Osaka&daddr=Arashiyama+Bamboo+Forest+to:Kinkaku-ji,+Kyoto',
     activities: [
       { id: 'a19', time: '08:00', name: 'Bosque de Bambú', hours: 'Abierto 24 horas', notes: 'Llegar temprano para disfrutar la paz del bosque.' },
       { id: 'a20', time: '11:00', name: 'Kinkaku-ji (Pabellón Oro)', hours: 'Abre 9:00 - Cierra 17:00', notes: 'Espectacular para fotos con el reflejo del agua.' }
@@ -84,6 +93,7 @@ const initialItinerary = [
   },
   { 
     id: 'd8', date: '22-may', region: 'OSAKA', theme: 'emerald', mainActivity: 'Castillo + Pokémon Café', 
+    routeQuery: 'saddr=Osaka+Castle&daddr=Pokemon+Cafe,+Osaka+to:Shinsekai,+Osaka',
     activities: [
       { id: 'a22', time: '09:30', name: 'Castillo de Osaka', hours: 'Abre 9:00 - Cierra 17:00', notes: 'Recorrido por los jardines exteriores.' },
       { id: 'a23', time: '13:00', name: 'Pokémon Café', hours: 'Abre 10:00 - Cierra 21:30', notes: '🎟️ RESERVA CRÍTICA. 🛍️ Solo aquí venden al Pikachu Chef exclusivo.' }
@@ -91,6 +101,7 @@ const initialItinerary = [
   },
   { 
     id: 'd9', date: '23-may', region: 'TRASLADO FUJI → TOKIO', theme: 'rose', mainActivity: 'Fuji + Omoide Yokocho', 
+    routeQuery: 'saddr=Shin-Osaka+Station&daddr=Fuji+Shibazakura+Festival+to:Omoide+Yokocho,+Shinjuku',
     activities: [
       { id: 'a27', time: '11:00', name: 'Shibazakura Festival', hours: 'Abre 8:00 - Cierra 16:00', notes: 'Ver el Fuji con los campos de flores rosas.' },
       { id: 'a28', time: '16:30', name: 'Highway Bus', notes: '🚌 Regreso directo a la estación de Shinjuku en Tokio.' },
@@ -99,6 +110,7 @@ const initialItinerary = [
   },
   { 
     id: 'd10', date: '24-may', region: 'KAMAKURA', theme: 'rose', mainActivity: 'Gran Buda + Atardecer Costero', 
+    routeQuery: 'saddr=Shinjuku+Station&daddr=Kotoku-in,+Kamakura+to:Kamakurakokomae+Station+to:Enoshima+to:Shinjuku+Station',
     activities: [
       { id: 'a29', time: '09:30', name: 'Buda Gigante', hours: 'Abre 8:00 - Cierra 17:30', notes: 'Templo Kotoku-in.' },
       { id: 'a29b', time: '12:00', name: 'Cruce Kamakurakokomae', notes: '📸 PARADA FOTOGRÁFICA: El famoso cruce de tren verde frente al mar (De la intro del anime Slam Dunk).' },
@@ -108,6 +120,7 @@ const initialItinerary = [
   },
   { 
     id: 'd11', date: '25-may', region: 'TOKIO', theme: 'blue', mainActivity: 'DÍA LIBRE y Despedida', 
+    routeQuery: 'saddr=Nakano+Broadway&daddr=Shimokitazawa,+Tokyo+to:Ueno+Station',
     activities: [
       { id: 'a31', time: '10:00', name: 'Shopping Libre', notes: '🛍️ Recomendaciones: Nakano Broadway (Cosas retro) o Shimokitazawa (Vintage).' },
       { id: 'a32', time: '20:00', name: 'Despedida', notes: '✈️ Vuelo al aeropuerto. El resto del grupo se muda al Hotel Tokio 3 (Ueno).' }
@@ -115,6 +128,7 @@ const initialItinerary = [
   },
   { 
     id: 'd12', date: '26-may', region: 'TOKIO', theme: 'blue', mainActivity: 'teamLab + Harajuku', 
+    routeQuery: 'saddr=Ueno+Station&daddr=teamLab+Planets+Tokyo+to:Takeshita+Street,+Harajuku',
     activities: [
       { id: 'a33', time: '09:00', name: 'teamLab Planets', hours: 'Abre 9:00 - Cierra 22:00', notes: '🎟️ Reserva obligatoria. Importante llevar pantalón que se pueda arremangar hasta la rodilla.' },
       { id: 'a34', time: '13:00', name: 'Harajuku / Takeshita Dori', notes: 'Comer crepes callejeros y ver las tiendas de moda extravagante.' }
@@ -122,12 +136,14 @@ const initialItinerary = [
   },
   { 
     id: 'd13', date: '27-may', region: 'TOKIO', theme: 'blue', mainActivity: 'Akihabara', 
+    routeQuery: 'saddr=Ueno+Station&daddr=Akihabara+Radio+Kaikan',
     activities: [
       { id: 'a35', time: '11:00', name: 'Akihabara', hours: 'Tiendas abren 10:00 - 11:00 AM', notes: '🕹️ Gachapones, electrónica y arcades de SEGA/GiGO.' }
     ] 
   },
   { 
     id: 'd14', date: '28-may', region: 'TOKIO → SEÚL', theme: 'blue', mainActivity: 'Compras + Tramo 1', 
+    routeQuery: 'saddr=Yamashiroya,+Ueno&daddr=Narita+International+Airport+to:Incheon+International+Airport',
     activities: [
       { id: 'a35b', time: '09:00', name: 'Compras última hora (Ueno)', hours: 'Abre 11:00 AM', notes: '🛍️ Aprovechar la mañana para visitar Yamashiroya (6 pisos de juguetes y kits de casas en miniatura).' },
       { id: 'a36', time: '16:00', name: 'Salida a Narita (NRT)', notes: '🚆 Tren Keisei Skyliner. Vuelo a Seúl a las 20:55.' },
@@ -136,6 +152,7 @@ const initialItinerary = [
   },
   { 
     id: 'd15', date: '29-may', region: 'SEÚL → COL', theme: 'blue', mainActivity: 'Regreso a Casa', 
+    routeQuery: 'saddr=Incheon+International+Airport&daddr=Mexico+City+International+Airport+to:Jose+Maria+Cordova+International+Airport',
     activities: [
       { id: 'a38', time: '11:40', name: 'Vuelo ICN → MEX', notes: '✈️ ⏱️ Escala en CDMX. Mejor descansar en sala VIP, no da el tiempo para salir.' },
       { id: 'a39', time: '22:00', name: 'Aterrizaje Medellín (MDE)', notes: '✈️ Fin de la aventura. 🎌' }
@@ -143,7 +160,7 @@ const initialItinerary = [
   }
 ];
 
-// --- LISTA DE CHEQUEO ACTUALIZADA ---
+// --- LISTA DE CHEQUEO INTACTA ---
 const initialChecklist = [
   { id: 'c_h1', category: 'hospedaje', text: 'Hotel Tokio 1 (Ueno) - 15 Mayo', completed: true },
   { id: 'c_h2', category: 'hospedaje', text: 'Hotel Osaka (Namba) - 16-23 Mayo', completed: true },
@@ -165,19 +182,6 @@ const initialChecklist = [
   { id: 'c_a6', category: 'atraccion', text: 'Tokyo Skytree', completed: false }
 ];
 
-// --- UBICACIONES PARA EL MAPA INTERACTIVO ---
-const mapLocations = [
-  { id: 'tokyo', name: 'Tokio', query: 'Tokyo, Japan', color: 'bg-blue-100 text-blue-800' },
-  { id: 'osaka', name: 'Osaka', query: 'Osaka, Japan', color: 'bg-emerald-100 text-emerald-800' },
-  { id: 'kyoto', name: 'Kioto', query: 'Kyoto, Japan', color: 'bg-emerald-100 text-emerald-800' },
-  { id: 'nara', name: 'Nara', query: 'Nara, Japan', color: 'bg-emerald-100 text-emerald-800' },
-  { id: 'kamakura', name: 'Kamakura', query: 'Kamakura, Japan', color: 'bg-rose-100 text-rose-800' },
-  { id: 'fuji', name: 'Monte Fuji', query: 'Mount Fuji, Japan', color: 'bg-rose-100 text-rose-800' },
-  { id: 'ghibli', name: 'Ghibli Park', query: 'Ghibli Park, Aichi, Japan', color: 'bg-rose-100 text-rose-800' },
-  { id: 'seoul', name: 'Seúl', query: 'Incheon International Airport, South Korea', color: 'bg-slate-200 text-slate-800' }
-];
-
-// COLORES PARA LAS FRANJITAS COMPLETAS
 const themeStyles = {
   blue: { bg: 'bg-blue-100', text: 'text-blue-900', pillBg: 'bg-blue-200', dot: 'bg-blue-500' },
   emerald: { bg: 'bg-emerald-100', text: 'text-emerald-900', pillBg: 'bg-emerald-200', dot: 'bg-emerald-500' },
@@ -190,8 +194,8 @@ export default function App() {
   const [checklist, setChecklist] = useState(initialChecklist);
   const [expandedDays, setExpandedDays] = useState([]);
   
-  // ESTADO PARA EL MAPA
-  const [mapQuery, setMapQuery] = useState('Japan');
+  // ESTADO PARA EL MAPA (Inicia en el Día 1 por defecto)
+  const [selectedMapDay, setSelectedMapDay] = useState('d1');
 
   useEffect(() => {
     const unsub = onSnapshot(doc(db, "viaje", "datos"), (docSnap) => {
@@ -215,9 +219,9 @@ export default function App() {
   };
 
   const forceUpdateCloud = async () => {
-    if(window.confirm("¿Sobreescribir la base de datos de la nube con los nuevos enlaces integrados?")) {
+    if(window.confirm("¿Sobreescribir la base de datos de la nube con las nuevas rutas GPS en el mapa?")) {
       await setDoc(doc(db, "viaje", "datos"), { itinerary: initialItinerary, checklist: initialChecklist });
-      alert("¡Nube actualizada! Los links oficiales están listos para usarse.");
+      alert("¡Nube actualizada! Las rutas GPS del mapa están listas.");
     }
   };
 
@@ -235,7 +239,6 @@ export default function App() {
             </div>
           </div>
           <div className="flex px-3 pb-2 justify-between">
-            {/* NUEVA BARRA DE NAVEGACIÓN CON EL MAPA */}
             {[ { id: 'resumen', icon: Home, label: 'Info' }, { id: 'mapa', icon: MapPin, label: 'Mapa' }, { id: 'itinerario', icon: Map, label: 'Ruta' }, { id: 'reservas', icon: CheckSquare, label: 'Check' } ].map((item) => (
               <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center justify-center gap-1.5 py-3 w-20 rounded-[20px] transition-all duration-300 ${activeTab === item.id ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-50'}`}>
                 <item.icon className="w-5 h-5" />
@@ -248,7 +251,7 @@ export default function App() {
 
       <main className="max-w-md mx-auto p-4 mt-2">
         
-        {/* INFO (INTACTO) */}
+        {/* PESTAÑA INFO */}
         {activeTab === 'resumen' && (
           <div className="space-y-4 animate-in fade-in duration-300">
             <div className="grid grid-cols-2 gap-4">
@@ -290,32 +293,43 @@ export default function App() {
           </div>
         )}
 
-        {/* NUEVA PESTAÑA: MAPA INTERACTIVO */}
+        {/* NUEVA PESTAÑA MAPA INTERACTIVO (DÍA POR DÍA) */}
         {activeTab === 'mapa' && (
           <div className="space-y-4 animate-in fade-in duration-300 flex flex-col h-[650px]">
             <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
-              {mapLocations.map((loc) => (
-                <button 
-                  key={loc.id} 
-                  onClick={() => setMapQuery(loc.query)}
-                  className={`flex-shrink-0 px-4 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-tight transition-all active:scale-95 ${mapQuery === loc.query ? 'bg-slate-900 text-white shadow-md' : `${loc.color} hover:opacity-80`}`}
-                >
-                  📍 {loc.name}
-                </button>
-              ))}
+              {itinerary.filter(day => !day.id.includes('v') && day.id !== 'd15').map((day) => {
+                const theme = themeStyles[day.theme];
+                return (
+                  <button 
+                    key={day.id} 
+                    onClick={() => setSelectedMapDay(day.id)}
+                    className={`flex-shrink-0 px-5 py-3 rounded-2xl text-[12px] font-black uppercase tracking-tight transition-all active:scale-95 ${selectedMapDay === day.id ? 'bg-slate-900 text-white shadow-md' : `${theme.bg} ${theme.text} hover:opacity-80`}`}
+                  >
+                    📍 {day.date}
+                  </button>
+                )
+              })}
             </div>
             
             <div className="flex-1 rounded-[32px] overflow-hidden border border-slate-200 shadow-sm bg-slate-100 relative">
               <iframe 
-                title="Mapa de Japón"
-                src={`https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=12&ie=UTF8&iwloc=&output=embed`}
+                title="Mapa de Rutas Diarias"
+                src={`https://maps.google.com/maps?${itinerary.find(d => d.id === selectedMapDay)?.routeQuery}&output=embed`}
                 className="absolute inset-0 w-full h-full border-0"
                 allowFullScreen=""
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               ></iframe>
             </div>
-            <p className="text-[10px] text-center text-slate-400 font-bold uppercase tracking-widest italic pt-2">Toca los pines de arriba para viajar</p>
+            
+            <div className="bg-slate-50 p-4 rounded-[20px] text-center border border-slate-100">
+              <p className="text-[12px] text-slate-700 font-black uppercase italic mb-1">
+                {itinerary.find(d => d.id === selectedMapDay)?.mainActivity}
+              </p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest italic">
+                Desliza los botones arriba para cambiar de día
+              </p>
+            </div>
           </div>
         )}
 
@@ -328,105 +342,4 @@ export default function App() {
               
               return (
                 <div key={day.id} className="transition-all duration-300">
-                  <button onClick={() => setExpandedDays(prev => isExpanded ? prev.filter(i => i !== day.id) : [...prev, day.id])} className={`w-full flex items-center justify-between p-4 rounded-[24px] transition-all duration-300 ${isExpanded ? 'bg-slate-50 mb-2' : theme.bg}`}>
-                    <div className="flex items-center gap-4 text-left">
-                      <div className={`px-4 py-2 rounded-[16px] ${theme.pillBg} ${theme.text} text-[11px] font-black tracking-tight`}>{day.date}</div>
-                      <span className={`font-black text-[13px] ${theme.text} uppercase tracking-tighter`}>{day.region}</span>
-                    </div>
-                    {isExpanded ? <ChevronUp className={`w-5 h-5 ${theme.text} opacity-50`} /> : <ChevronDown className={`w-5 h-5 ${theme.text} opacity-50`} />}
-                  </button>
-                  
-                  {isExpanded && (
-                    <div className="px-4 pb-6 pt-2 animate-in slide-in-from-top-2">
-                      <div className="mb-6">
-                         <p className="text-[14px] font-black text-slate-800 italic">"{day.mainActivity}"</p>
-                      </div>
-                      
-                      <div className="space-y-0">
-                        {day.activities.map((act) => (
-                          <div key={act.id} className="relative pl-6 border-l-2 border-slate-100 ml-2 pb-6 last:pb-0 text-left">
-                            <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full ${theme.dot} border-[3px] border-white shadow-sm`} />
-                            
-                            <div className="mb-1">
-                              <span className={`text-[11px] font-black ${theme.text} uppercase tracking-tight block mb-0.5`}>{act.time}</span>
-                              <span className="font-black text-[13px] text-slate-800 leading-tight uppercase">{act.name}</span>
-                            </div>
-                            
-                            {act.hours && <p className="text-[10px] font-bold text-slate-400 mt-1 tracking-tight">⏱️ {act.hours}</p>}
-                            <p className="text-[12px] text-slate-600 font-medium leading-relaxed mt-2">{act.notes}</p>
-                            
-                            {act.link && (
-                              <a 
-                                href={act.link} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className={`inline-flex items-center gap-1 mt-3 text-[11px] font-black ${theme.text} ${theme.pillBg} px-4 py-2 rounded-xl hover:opacity-80 transition-all shadow-sm active:scale-95`}
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {act.linkLabel} 🔗
-                              </a>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* CHECK (INTACTO) */}
-        {activeTab === 'reservas' && (
-          <div className="space-y-8 pb-24 animate-in fade-in duration-300">
-            <div className="bg-slate-50 rounded-[32px] p-6">
-               <h3 className="font-black text-slate-900 text-sm uppercase mb-4 flex items-center gap-2"><Building className="w-5 h-5 text-indigo-500" /> Hospedajes</h3>
-               <div className="space-y-2">
-                 {checklist.filter(i => i.category === 'hospedaje').map(item => (
-                   <label key={item.id} className="flex items-center gap-4 p-4 bg-white rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
-                     <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-indigo-600 checked:bg-indigo-600 transition-all" />
-                     <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'}`}>{item.text}</span>
-                   </label>
-                 ))}
-               </div>
-            </div>
-
-            <div className="bg-slate-50 rounded-[32px] p-6">
-               <h3 className="font-black text-slate-900 text-sm uppercase mb-4 flex items-center gap-2"><Train className="w-5 h-5 text-rose-500" /> Transportes y Trámites</h3>
-               <div className="space-y-2">
-                 {checklist.filter(i => i.category === 'transporte').map(item => (
-                   <label key={item.id} className="flex items-center gap-4 p-4 bg-white rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
-                     <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-rose-600 checked:bg-rose-600 transition-all" />
-                     <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'}`}>{item.text}</span>
-                   </label>
-                 ))}
-               </div>
-               <div className="mt-4 p-4 bg-rose-100/50 rounded-[20px] flex gap-3 text-left border border-rose-200">
-                  <AlertTriangle className="w-5 h-5 text-rose-500 flex-shrink-0" />
-                  <p className="text-[11px] font-medium text-rose-800 leading-relaxed"><strong>¡Atención!</strong> Los tickets de trenes bala (App SmartEX) y buses de larga distancia (Highway Bus al Fuji) se habilitan para comprar exactamente <strong>30 días antes</strong> de la fecha del viaje.</p>
-               </div>
-            </div>
-
-            <div className="bg-slate-50 rounded-[32px] p-6">
-               <h3 className="font-black text-slate-900 text-sm uppercase mb-4 flex items-center gap-2"><Ticket className="w-5 h-5 text-emerald-500" /> Atracciones</h3>
-               <div className="space-y-2">
-                 {checklist.filter(i => i.category === 'atraccion').map(item => (
-                   <label key={item.id} className="flex items-center gap-4 p-4 bg-white rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
-                     <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-emerald-600 checked:bg-emerald-600 transition-all" />
-                     <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'}`}>{item.text}</span>
-                   </label>
-                 ))}
-               </div>
-               <div className="mt-4 p-4 bg-amber-50 rounded-[20px] flex gap-3 text-left border border-amber-200">
-                  <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
-                  <p className="text-[11px] font-medium text-amber-800 leading-relaxed"><strong>Advertencia Nivel Extremo:</strong> Las reservas para Shibuya Sky y Pokémon Café vuelan en minutos. Pongan una alarma <strong>4 semanas antes a las 6:00 PM (hora de Japón)</strong>.</p>
-               </div>
-            </div>
-
-          </div>
-        )}
-      </main>
-    </div>
-  );
-}
+                  <button onClick={() => setExpandedDays(prev => isExpanded ? prev.filter(i => i !== day.id) : [...prev, day.id])} className={
