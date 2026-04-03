@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, onSnapshot, setDoc } from "firebase/firestore";
 import { 
-  Home, CalendarDays, Map, CheckSquare, Moon, Train, Ticket, 
-  ChevronDown, ChevronUp, Zap, ShoppingBag, AlertTriangle, BookOpen, Building, Lightbulb, MapPin
+  Home, CalendarDays, Map, CheckSquare, Moon, Sun, Train, Ticket, 
+  ChevronDown, ChevronUp, Zap, ShoppingBag, AlertTriangle, BookOpen, Building, Lightbulb, MapPin, CloudCog
 } from 'lucide-react';
 
 // --- CONFIGURACIÓN FIREBASE ---
@@ -19,13 +19,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- ITINERARIO MAESTRO CON RUTAS GPS INYECTADAS ---
+// --- ITINERARIO MAESTRO ---
 const initialItinerary = [
   { 
     id: 'd_v1', date: '13-may', region: 'VUELO IDA', theme: 'blue', mainActivity: 'Salida MDE → MEX', 
     routeQuery: 'saddr=Jose+Maria+Cordova+International+Airport&daddr=Mexico+City+International+Airport+to:Narita+International+Airport',
     activities: [
-      { id: 'a_v1', time: '01:00', name: 'Salida MDE → MEX', notes: '✈️ Llegada 04:35 AM. ⏱️ ESCALA: 17h 40m. 🇲🇽 LOGÍSTICA: Es obligatorio hacer pre-registro y migración en México si se desea salir a conocer. Recomendación: Salir a desayunar tacos al Centro Histórico.', link: 'https://www.inm.gob.mx/spublic/portal/inmex.html', linkLabel: '📝 Llenar Pre-registro (México)' },
+      { id: 'a_v1', time: '01:00', name: 'Salida MDE → MEX', notes: '✈️ Llegada 04:35 AM. ⏱️ ESCALA: 17h 40m. 🇲🇽 LOGÍSTICA: Es obligatorio hacer pre-registro y migración en México si se desea salir a conocer. Recomendación: Salir a desayunar tacos al Centro Histórico.', link: 'https://www.inm.gob.mx/spublic/portal/inmex.html', linkLabel: '📝 Pre-registro MX' },
       { id: 'a_v2', time: '22:15', name: 'MEX → NRT', notes: '✈️ Tramo largo hacia Tokio. Estar de vuelta en el aeropuerto 3 horas antes.' }
     ] 
   },
@@ -37,130 +37,147 @@ const initialItinerary = [
     ] 
   },
   { 
-    id: 'd1', date: '15-may', region: 'TOKIO', theme: 'blue', mainActivity: 'Aterrizaje + Ueno + Asakusa', 
-    routeQuery: 'saddr=Narita+International+Airport&daddr=Senso-ji,+Tokyo+to:Tokyo+Skytree',
+    id: 'd1', date: '15-may', region: 'TOKIO', theme: 'blue', mainActivity: 'Ueno + Asakusa Profundo', 
+    routeQuery: 'saddr=Narita+International+Airport&daddr=Asakusa+Culture+Tourist+Information+Center+to:Kaminarimon+to:Senso-ji+to:Asakusa+Hanayashiki+to:Asahi+Beer+Hall+to:Tokyo+Skytree+to:Don+Quijote+Asakusa',
     activities: [
-      { id: 'a1', time: '06:30', name: 'Aterrizaje Narita (NRT)', notes: 'Pasar migración (Mostrar QR de Visit Japan Web). Recoger Suica/Pasmo y activar eSIM. Dejar maletas en hotel.', link: 'https://www.vjw.digital.go.jp/', linkLabel: '🛂 Llenar Visit Japan Web' },
-      { id: 'a3', time: '13:00', name: 'Templo Senso-ji', hours: 'Abre 6:00 - Cierra 17:00', notes: '⛩️ Comprar el "Goshuincho" (Libro de sellos). En cada templo pondrán una caligrafía única. La calle Nakamise (comida) cierra a las 17:00.' },
-      { id: 'a4', time: '17:30', name: 'Tokyo Skytree', hours: 'Abre 10:00 - Cierra 21:00', notes: '🎟️ Reserva obligatoria. Subir para el atardecer.' }
+      { id: 'a1', time: '06:30', name: 'Aterrizaje Narita (NRT)', notes: 'Pasar migración (Mostrar QR de Visit Japan Web). Recoger Suica/Pasmo y activar eSIM. Dejar maletas en hotel Ueno.', link: 'https://www.vjw.digital.go.jp/', linkLabel: '🛂 Visit Japan Web' },
+      { id: 'a2', time: '12:00', name: 'Centro Turístico Asakusa', notes: '🏢 Subir al piso 8 (gratis) para la mejor vista de la calle Nakamise y el templo.' },
+      { id: 'a3', time: '13:00', name: 'Kaminarimon y Senso-ji', hours: '6:00 - 17:00', notes: '⛩️ Recorrer la calle Nakamise. 🛍️ Comprar el "Goshuincho" (Libro de sellos) por unos ¥1,500 (~$39,000 COP).' },
+      { id: 'a3b', time: '15:00', name: 'Asakusa Hanayashiki', hours: '10:00 - 18:00', notes: '🎢 El parque de atracciones más antiguo de Japón. Vistas vintage increíbles.' },
+      { id: 'a4', time: '17:30', name: 'Tokyo Skytree y Asahi', hours: '10:00 - 21:00', notes: '🚶 Cruzar el río Sumida viendo el edificio dorado de Asahi. 🎟️ Subir al Skytree para el atardecer (Reserva previa).' },
+      { id: 'a4b', time: '19:30', name: 'Don Quijote y Hobby Off', notes: '🛍️ Donki abre 24h para comprar snacks. Hobby Off es ideal para buscar figuras de anime de segunda mano baratas.' }
     ] 
   },
   { 
-    id: 'd2', date: '16-may', region: 'TOKIO → OSAKA', theme: 'blue', mainActivity: 'Shibuya + Shinkansen', 
-    routeQuery: 'saddr=Shibuya+Crossing&daddr=Shibuya+Sky+to:Tokyo+Station+to:Shin-Osaka+Station',
+    id: 'd2', date: '16-may', region: 'TOKIO → OSAKA', theme: 'blue', mainActivity: 'Shibuya + Odaiba', 
+    routeQuery: 'saddr=Shibuya+Crossing&daddr=Shibuya+Sky+to:Odaiba+Gundam+Base+to:Tokyo+Station+to:Shin-Osaka+Station',
     activities: [
-      { id: 'a5', time: '09:00', name: 'Shibuya Crossing', notes: 'Cruce peatonal más famoso y foto con Hachiko.' },
-      { id: 'a5b', time: '10:30', name: 'Shibuya Sky', hours: 'Abre 10:00 - Cierra 22:30', notes: '🎟️ RESERVA OBLIGATORIA (Hacerla 4 semanas antes). Vista panorámica al aire libre.' },
-      { id: 'a7', time: '18:30', name: 'Shinkansen a Osaka', notes: '🚆 Tip: Comprar Eki-ben (lunch box japonesas) en la estación para cenar adentro del tren bala.' }
+      { id: 'a5', time: '09:00', name: 'Shibuya y Hachiko', notes: 'Cruce peatonal más famoso del mundo y la estatua de Hachiko.' },
+      { id: 'a5b', time: '10:30', name: 'Shibuya Sky', hours: '10:00 - 22:30', notes: '🎟️ RESERVA OBLIGATORIA (Hacerla 4 semanas antes). Vista panorámica increíble.' },
+      { id: 'a6', time: '14:00', name: 'Odaiba (Gundam Base)', notes: '🚆 Tomar el tren Yurikamome. Ver el Gundam Unicorn gigante a escala real y el centro comercial DiverCity.' },
+      { id: 'a7', time: '18:30', name: 'Shinkansen a Osaka', notes: '🚆 Tip: Comprar Eki-ben (lunch box japonesas) en la estación de Tokio para cenar adentro del tren bala.' }
     ] 
   },
   { 
-    id: 'd3', date: '17-may', region: 'NAGOYA / OSAKA', theme: 'rose', mainActivity: 'Ghibli Park', 
-    routeQuery: 'saddr=Shin-Osaka+Station&daddr=Ghibli+Park,+Aichi+to:Dotonbori,+Osaka',
+    id: 'd3', date: '17-may', region: 'NAGOYA / OSAKA', theme: 'rose', mainActivity: 'Ghibli Park + Noche Osaka', 
+    routeQuery: 'saddr=Shin-Osaka+Station&daddr=Ghibli+Park,+Aichi+to:Namba+Yasaka+Shrine+to:Dotonbori,+Osaka',
     activities: [
-      { id: 'a11', time: '10:00', name: 'Ghibli Park', hours: 'Abre 10:00 - Cierra 17:00', notes: '🎟️ CONFIRMADO. 🛍️ La tienda "Adventurous Spirit" tiene mercancía exclusiva que no venden en Tokio.' }
+      { id: 'a11', time: '10:00', name: 'Ghibli Park (Nagoya)', hours: '10:00 - 17:00', notes: '🎟️ CONFIRMADO. 🛍️ La tienda "Adventurous Spirit" tiene mercancía exclusiva.' },
+      { id: 'a11b', time: '17:30', name: 'Namba Yasaka Shrine', hours: 'Cierra 17:00 (Ver de afuera)', notes: '👹 Retorno a Osaka. El increíble santuario con forma de cabeza de león gigante.' },
+      { id: 'a12', time: '19:00', name: 'Dotonbori', notes: '🐙 Noche fuerte en Osaka. Comer Takoyaki, Okonomiyaki y tomar fotos con el cartel de Glico Man bajo los neones.' }
     ] 
   },
   { 
     id: 'd4', date: '18-may', region: 'OSAKA', theme: 'emerald', mainActivity: 'Universal Studios Japan', 
     routeQuery: 'saddr=Namba+Station,+Osaka&daddr=Universal+Studios+Japan',
     activities: [
-      { id: 'a13', time: '08:00', name: 'USJ', hours: 'Varia (~8:00 - 21:00)', notes: '🎟️ CONFIRMADO. Apenas se pase la puerta de entrada, usar la app de USJ para sacar el "Timed Entry Ticket" de Nintendo.' }
+      { id: 'a13', time: '08:00', name: 'USJ', hours: 'Varia (~8:00 - 21:00)', notes: '🎟️ CONFIRMADO. Apenas se pase la puerta, usar la app de USJ para sacar el "Timed Entry Ticket" de Nintendo.' }
     ] 
   },
   { 
-    id: 'd5', date: '19-may', region: 'NARA', theme: 'emerald', mainActivity: 'Ciervos y Templos', 
-    routeQuery: 'saddr=Namba+Station,+Osaka&daddr=Todai-ji,+Nara',
+    id: 'd5', date: '19-may', region: 'NARA', theme: 'emerald', mainActivity: 'Templos y Tradición', 
+    routeQuery: 'saddr=Namba+Station,+Osaka&daddr=Todai-ji,+Nara+to:Kasuga+Taisha+to:Naramachi',
     activities: [
-      { id: 'a14', time: '09:30', name: 'Templo Todai-ji', hours: 'Abre 7:30 - Cierra 17:30', notes: '🦌 Comprar galletas oficiales para los ciervos. El Buda de bronce adentro es gigante.' }
+      { id: 'a14', time: '09:30', name: 'Templo Todai-ji', hours: '7:30 - 17:30', notes: '🦌 Comprar galletas oficiales para ciervos. Ver el Buda de bronce gigante.' },
+      { id: 'a14b', time: '12:30', name: 'Kasuga Taisha', hours: '6:30 - 17:00', notes: '⛩️ Famoso santuario sintoísta rodeado de miles de linternas de piedra y bronce en el bosque.' },
+      { id: 'a14c', time: '15:00', name: 'Naramachi', notes: '🚶 El antiguo distrito comercial de Nara. Calles tradicionales, artesanías y destilerías de sake.' }
     ] 
   },
   { 
-    id: 'd6', date: '20-may', region: 'KIOTO SUR', theme: 'emerald', mainActivity: 'Fushimi Inari + Calles Tradicionales', 
-    routeQuery: 'saddr=Namba+Station,+Osaka&daddr=Fushimi+Inari+Taisha+to:Ninenzaka,+Kyoto+to:Gion,+Kyoto',
+    id: 'd6', date: '20-may', region: 'KIOTO SUR', theme: 'emerald', mainActivity: 'Fushimi Inari + Uji + Gion', 
+    routeQuery: 'saddr=Namba+Station,+Osaka&daddr=Fushimi+Inari+Taisha+to:Byodo-in,+Uji+to:Gion,+Kyoto',
     activities: [
-      { id: 'a15', time: '07:00', name: 'Fushimi Inari', hours: 'Abierto 24 horas', notes: '⛩️ Subir temprano hasta el primer mirador para tomar fotos sin tanta gente.' },
-      { id: 'a17', time: '14:30', name: 'Ninenzaka y Sannenzaka', notes: 'Caminar por las calles de madera. ☕ Buscar el Starbucks escondido en una casa tradicional.' }
+      { id: 'a15', time: '07:00', name: 'Fushimi Inari', hours: 'Abierto 24h', notes: '⛩️ Subir temprano hasta el primer mirador para tomar fotos sin tanta gente.' },
+      { id: 'a16', time: '11:00', name: 'Uji y Templo Byodo-in', hours: '8:30 - 17:30', notes: '🍵 Capital del Matcha. Probar helados y fideos de té verde. El templo Byodo-in es el que sale en la moneda de ¥10.' },
+      { id: 'a17', time: '17:00', name: 'Barrio de Gion', notes: '🚶 Caminar por Hanamikoji al atardecer con posibilidad de ver Geishas reales y cenar cerca del río Kamo.' }
     ] 
   },
   { 
-    id: 'd7', date: '21-may', region: 'KIOTO NORTE', theme: 'emerald', mainActivity: 'Pabellón Dorado', 
-    routeQuery: 'saddr=Namba+Station,+Osaka&daddr=Arashiyama+Bamboo+Forest+to:Kinkaku-ji,+Kyoto',
+    id: 'd7', date: '21-may', region: 'KIOTO NORTE', theme: 'emerald', mainActivity: 'Arashiyama + Kinkaku-ji', 
+    routeQuery: 'saddr=Namba+Station,+Osaka&daddr=Arashiyama+Bamboo+Forest+to:Kinkaku-ji,+Kyoto+to:Nishiki+Market+to:Ninenzaka',
     activities: [
-      { id: 'a19', time: '08:00', name: 'Bosque de Bambú', hours: 'Abierto 24 horas', notes: 'Llegar temprano para disfrutar la paz del bosque.' },
-      { id: 'a20', time: '11:00', name: 'Kinkaku-ji (Pabellón Oro)', hours: 'Abre 9:00 - Cierra 17:00', notes: 'Espectacular para fotos con el reflejo del agua.' }
+      { id: 'a19', time: '08:00', name: 'Bosque de Bambú (Arashiyama)', hours: 'Abierto 24h', notes: '🎋 Llegar temprano para disfrutar la paz del bosque y ver el Templo Tenryu-ji.' },
+      { id: 'a20', time: '11:30', name: 'Kinkaku-ji (Pabellón de Oro)', hours: '9:00 - 17:00', notes: '📸 Espectacular para fotos con el reflejo del agua.' },
+      { id: 'a21', time: '14:30', name: 'Nishiki Market', hours: '10:00 - 17:00', notes: '🍢 Probar comida callejera local. (Ojo: ¡Cierra a las 5 PM!).' },
+      { id: 'a21b', time: '17:00', name: 'Ninenzaka / Sannenzaka', notes: '☕ Calles de madera históricas en la colina. Aquí queda el Starbucks tradicional.' }
     ] 
   },
   { 
-    id: 'd8', date: '22-may', region: 'OSAKA', theme: 'emerald', mainActivity: 'Castillo + Pokémon Café', 
-    routeQuery: 'saddr=Osaka+Castle&daddr=Pokemon+Cafe,+Osaka+to:Shinsekai,+Osaka',
+    id: 'd8', date: '22-may', region: 'OSAKA', theme: 'emerald', mainActivity: 'Castillo + Kuromon + Pokémon', 
+    routeQuery: 'saddr=Osaka+Castle&daddr=Kuromon+Ichiba+Market+to:Pokemon+Cafe,+Osaka+to:Shinsekai,+Osaka',
     activities: [
-      { id: 'a22', time: '09:30', name: 'Castillo de Osaka', hours: 'Abre 9:00 - Cierra 17:00', notes: 'Recorrido por los jardines exteriores.' },
-      { id: 'a23', time: '13:00', name: 'Pokémon Café', hours: 'Abre 10:00 - Cierra 21:30', notes: '🎟️ RESERVA CRÍTICA. 🛍️ Solo aquí venden al Pikachu Chef exclusivo.' }
+      { id: 'a22', time: '09:00', name: 'Castillo de Osaka', hours: '9:00 - 17:00', notes: 'Recorrido por los inmensos jardines exteriores.' },
+      { id: 'a22b', time: '11:00', name: 'Kuromon Ichiba Market', hours: '9:00 - 17:00', notes: '🍣 "La cocina de Osaka". Excelente para desayunar/almorzar mariscos frescos y carne Wagyu.' },
+      { id: 'a23', time: '14:00', name: 'Pokémon Café', hours: '10:00 - 21:30', notes: '🎟️ RESERVA CRÍTICA. 🛍️ Venden al Pikachu Chef exclusivo. ⚠️ Enviar maletas a Tokio hoy mismo.' },
+      { id: 'a24', time: '18:00', name: 'Shinsekai', notes: '🍻 Zona retro, vibras cyberpunk. Comer Kushikatsu (brochetas fritas).' }
     ] 
   },
   { 
-    id: 'd9', date: '23-may', region: 'TRASLADO FUJI → TOKIO', theme: 'rose', mainActivity: 'Fuji + Omoide Yokocho', 
-    routeQuery: 'saddr=Shin-Osaka+Station&daddr=Fuji+Shibazakura+Festival+to:Omoide+Yokocho,+Shinjuku',
+    id: 'd9', date: '23-may', region: 'FUJI → TOKIO', theme: 'rose', mainActivity: 'Shibazakura + Omoide Yokocho', 
+    routeQuery: 'saddr=Shin-Osaka+Station&daddr=Mishima+Station+to:Fuji+Shibazakura+Festival+to:Omoide+Yokocho,+Shinjuku',
     activities: [
-      { id: 'a27', time: '11:00', name: 'Shibazakura Festival', hours: 'Abre 8:00 - Cierra 16:00', notes: 'Ver el Fuji con los campos de flores rosas.' },
-      { id: 'a28', time: '16:30', name: 'Highway Bus', notes: '🚌 Regreso directo a la estación de Shinjuku en Tokio.' },
-      { id: 'a28b', time: '19:30', name: 'Omoide Yokocho (Shinjuku)', hours: 'Bares cierran medianoche', notes: '🍢 El famoso callejón retro. Yakitoris y cervezas. ¡Plan perfecto para cenar los 5 juntos!' }
+      { id: 'a25', time: '06:30', name: 'Salida Osaka → Mishima', notes: '🚆 Tomar Shinkansen Kodama muy temprano para aprovechar el día.' },
+      { id: 'a26', time: '09:30', name: 'Bus a Kawaguchiko', notes: '🚌 Desde Mishima Station. (Llevar efectivo para tickets locales).' },
+      { id: 'a27', time: '11:00', name: 'Shibazakura Festival', hours: '8:00 - 16:00', notes: '🌸 Ver el Monte Fuji rodeado de inmensos campos de flores rosas.' },
+      { id: 'a28', time: '16:00', name: 'Highway Bus a Tokio', notes: '🚌 Regreso directo a la estación de Shinjuku (🎟️ Reserva previa obligatoria).' },
+      { id: 'a28b', time: '19:30', name: 'Omoide Yokocho (Shinjuku)', hours: 'Bares cierran medianoche', notes: '🍢 El "Callejón de los recuerdos". Humo, yakitoris y cervezas. ¡Cena espectacular para los 5!' }
     ] 
   },
   { 
     id: 'd10', date: '24-may', region: 'KAMAKURA', theme: 'rose', mainActivity: 'Gran Buda + Atardecer Costero', 
-    routeQuery: 'saddr=Shinjuku+Station&daddr=Kotoku-in,+Kamakura+to:Kamakurakokomae+Station+to:Enoshima+to:Shinjuku+Station',
+    routeQuery: 'saddr=Shinjuku+Station&daddr=Kotoku-in,+Kamakura+to:Hasedera+to:Kamakurakokomae+Station+to:Enoshima+to:Shinjuku+Station',
     activities: [
-      { id: 'a29', time: '09:30', name: 'Buda Gigante', hours: 'Abre 8:00 - Cierra 17:30', notes: 'Templo Kotoku-in.' },
-      { id: 'a29b', time: '12:00', name: 'Cruce Kamakurakokomae', notes: '📸 PARADA FOTOGRÁFICA: El famoso cruce de tren verde frente al mar (De la intro del anime Slam Dunk).' },
-      { id: 'a30', time: '15:30', name: 'Isla de Enoshima', notes: 'Caminar cruzando el puente, ver el atardecer en los acantilados.' },
-      { id: 'a30b', time: '18:30', name: 'Regreso a Tokio', notes: '🚆 Tomar el tren Odakyu Romancecar directo desde la costa hasta Shinjuku (1h 15m).' }
+      { id: 'a29', time: '09:30', name: 'Buda Gigante (Daibutsu)', hours: '8:00 - 17:30', notes: 'Templo Kotoku-in.' },
+      { id: 'a29b', time: '10:30', name: 'Templo Hasedera', hours: '8:00 - 17:00', notes: '🌿 Templo con jardines hermosos y un mirador con vista al océano.' },
+      { id: 'a29c', time: '12:30', name: 'Cruce Kamakurakokomae', notes: '📸 PARADA FOTOGRÁFICA: El famoso cruce de tren verde frente al mar (Slam Dunk).' },
+      { id: 'a30', time: '15:00', name: 'Isla de Enoshima', notes: 'Caminar cruzando el puente, subir a los santuarios y ver el atardecer.' },
+      { id: 'a30b', time: '18:30', name: 'Regreso a Tokio', notes: '🚆 Tomar tren directo Odakyu Romancecar a Shinjuku (1h 15m).' }
     ] 
   },
   { 
     id: 'd11', date: '25-may', region: 'TOKIO', theme: 'blue', mainActivity: 'DÍA LIBRE y Despedida', 
     routeQuery: 'saddr=Nakano+Broadway&daddr=Shimokitazawa,+Tokyo+to:Ueno+Station',
     activities: [
-      { id: 'a31', time: '10:00', name: 'Shopping Libre', notes: '🛍️ Recomendaciones: Nakano Broadway (Cosas retro) o Shimokitazawa (Vintage).' },
-      { id: 'a32', time: '20:00', name: 'Despedida', notes: '✈️ Vuelo al aeropuerto. El resto del grupo se muda al Hotel Tokio 3 (Ueno).' }
+      { id: 'a31', time: '10:00', name: 'Shopping Libre', notes: '🛍️ Para perderse comprando: Nakano Broadway (Anime barato) o Shimokitazawa (Ropa vintage).' },
+      { id: 'a32', time: '20:00', name: 'Despedida', notes: '✈️ Salida de parte del grupo al aeropuerto. Reubicación en el Hotel Tokio 3 (Ueno).' }
     ] 
   },
   { 
     id: 'd12', date: '26-may', region: 'TOKIO', theme: 'blue', mainActivity: 'teamLab + Harajuku', 
-    routeQuery: 'saddr=Ueno+Station&daddr=teamLab+Planets+Tokyo+to:Takeshita+Street,+Harajuku',
+    routeQuery: 'saddr=Ueno+Station&daddr=teamLab+Planets+Tokyo+to:Takeshita+Street,+Harajuku+to:Meiji+Jingu',
     activities: [
-      { id: 'a33', time: '09:00', name: 'teamLab Planets', hours: 'Abre 9:00 - Cierra 22:00', notes: '🎟️ Reserva obligatoria. Importante llevar pantalón que se pueda arremangar hasta la rodilla.' },
-      { id: 'a34', time: '13:00', name: 'Harajuku / Takeshita Dori', notes: 'Comer crepes callejeros y ver las tiendas de moda extravagante.' }
+      { id: 'a33', time: '09:00', name: 'teamLab Planets', hours: '9:00 - 22:00', notes: '🎟️ Reserva previa. OJO: No confundir con teamLab Borderless. Llevar pantalón que se pueda arremangar hasta la rodilla porque se entra al agua.' },
+      { id: 'a34', time: '13:00', name: 'Harajuku (Takeshita Dori)', notes: 'La calle de la moda extravagante. Comer crepes y algodón de azúcar gigante.' },
+      { id: 'a34b', time: '16:00', name: 'Santuario Meiji Jingu', hours: 'Abre al amanecer - Cierra atardecer', notes: '⛩️ Santuario inmerso en un bosque gigante justo al lado de la locura de Harajuku.' }
     ] 
   },
   { 
     id: 'd13', date: '27-may', region: 'TOKIO', theme: 'blue', mainActivity: 'Akihabara', 
-    routeQuery: 'saddr=Ueno+Station&daddr=Akihabara+Radio+Kaikan',
+    routeQuery: 'saddr=Ueno+Station&daddr=Akihabara+Radio+Kaikan+to:GiGO+Akihabara',
     activities: [
-      { id: 'a35', time: '11:00', name: 'Akihabara', hours: 'Tiendas abren 10:00 - 11:00 AM', notes: '🕹️ Gachapones, electrónica y arcades de SEGA/GiGO.' }
+      { id: 'a35', time: '11:00', name: 'Akihabara Otaku', hours: 'Tiendas abren 10:00 - 11:00 AM', notes: '🕹️ Buscar el edificio "Radio Kaikan" para figuras, explorar Maid Cafes y gastar monedas en Gachapones y arcades.' }
     ] 
   },
   { 
-    id: 'd14', date: '28-may', region: 'TOKIO → SEÚL', theme: 'blue', mainActivity: 'Compras + Tramo 1', 
+    id: 'd14', date: '28-may', region: 'TOKIO → SEÚL', theme: 'blue', mainActivity: 'Compras Finales + Vuelo', 
     routeQuery: 'saddr=Yamashiroya,+Ueno&daddr=Narita+International+Airport+to:Incheon+International+Airport',
     activities: [
-      { id: 'a35b', time: '09:00', name: 'Compras última hora (Ueno)', hours: 'Abre 11:00 AM', notes: '🛍️ Aprovechar la mañana para visitar Yamashiroya (6 pisos de juguetes y kits de casas en miniatura).' },
+      { id: 'a35b', time: '09:00', name: 'Compras última hora (Ueno)', hours: 'Abre 11:00 AM', notes: '🛍️ Aprovechar la mañana para visitar Yamashiroya (6 pisos de juguetes y kits de casas en miniatura) o la calle Ameyoko.' },
       { id: 'a36', time: '16:00', name: 'Salida a Narita (NRT)', notes: '🚆 Tren Keisei Skyliner. Vuelo a Seúl a las 20:55.' },
-      { id: 'a37', time: '23:25', name: 'Llegada a Seúl (ICN)', notes: '🇰🇷 ⏱️ ESCALA NOCTURNA. ⚠️ CRÍTICO: Si se desea salir del aeropuerto a la ciudad, es obligatorio tramitar el permiso K-ETA por internet semanas antes. Si no, dormir en el hotel cápsula Darakhyu dentro de la terminal.', link: 'https://www.k-eta.go.kr/', linkLabel: '🇰🇷 Tramitar K-ETA Oficial' }
+      { id: 'a37', time: '23:25', name: 'Llegada a Seúl (ICN)', notes: '🇰🇷 ⏱️ ESCALA NOCTURNA. ⚠️ CRÍTICO: Si se desea salir del aeropuerto a la ciudad, es obligatorio tramitar el permiso K-ETA por internet semanas antes. Si no, dormir en el hotel cápsula Darakhyu dentro de la terminal.', link: 'https://www.k-eta.go.kr/', linkLabel: '🇰🇷 Tramitar K-ETA' }
     ] 
   },
   { 
     id: 'd15', date: '29-may', region: 'SEÚL → COL', theme: 'blue', mainActivity: 'Regreso a Casa', 
     routeQuery: 'saddr=Incheon+International+Airport&daddr=Mexico+City+International+Airport+to:Jose+Maria+Cordova+International+Airport',
     activities: [
-      { id: 'a38', time: '11:40', name: 'Vuelo ICN → MEX', notes: '✈️ ⏱️ Escala en CDMX. Mejor descansar en sala VIP, no da el tiempo para salir.' },
+      { id: 'a38', time: '11:40', name: 'Vuelo ICN → MEX', notes: '✈️ ⏱️ Escala en CDMX. Mejor descansar en sala VIP, no da el tiempo para salir a la ciudad.' },
       { id: 'a39', time: '22:00', name: 'Aterrizaje Medellín (MDE)', notes: '✈️ Fin de la aventura. 🎌' }
     ] 
   }
 ];
 
-// --- LISTA DE CHEQUEO INTACTA ---
+// --- LISTA DE CHEQUEO ---
 const initialChecklist = [
   { id: 'c_h1', category: 'hospedaje', text: 'Hotel Tokio 1 (Ueno) - 15 Mayo', completed: true },
   { id: 'c_h2', category: 'hospedaje', text: 'Hotel Osaka (Namba) - 16-23 Mayo', completed: true },
@@ -183,9 +200,9 @@ const initialChecklist = [
 ];
 
 const themeStyles = {
-  blue: { bg: 'bg-blue-100', text: 'text-blue-900', pillBg: 'bg-blue-200', dot: 'bg-blue-500' },
-  emerald: { bg: 'bg-emerald-100', text: 'text-emerald-900', pillBg: 'bg-emerald-200', dot: 'bg-emerald-500' },
-  rose: { bg: 'bg-rose-100', text: 'text-rose-900', pillBg: 'bg-rose-200', dot: 'bg-rose-500' }
+  blue: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-900 dark:text-blue-300', pillBg: 'bg-blue-200 dark:bg-blue-800/50', dot: 'bg-blue-500' },
+  emerald: { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-900 dark:text-emerald-300', pillBg: 'bg-emerald-200 dark:bg-emerald-800/50', dot: 'bg-emerald-500' },
+  rose: { bg: 'bg-rose-100 dark:bg-rose-900/30', text: 'text-rose-900 dark:text-rose-300', pillBg: 'bg-rose-200 dark:bg-rose-800/50', dot: 'bg-rose-500' }
 };
 
 export default function App() {
@@ -193,9 +210,8 @@ export default function App() {
   const [itinerary, setItinerary] = useState(initialItinerary);
   const [checklist, setChecklist] = useState(initialChecklist);
   const [expandedDays, setExpandedDays] = useState([]);
-  
-  // ESTADO PARA EL MAPA (Inicia en el Día 1 por defecto)
   const [selectedMapDay, setSelectedMapDay] = useState('d1');
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     const unsub = onSnapshot(doc(db, "viaje", "datos"), (docSnap) => {
@@ -219,228 +235,251 @@ export default function App() {
   };
 
   const forceUpdateCloud = async () => {
-    if(window.confirm("¿Sobreescribir la base de datos de la nube con las nuevas rutas GPS en el mapa?")) {
-      await setDoc(doc(db, "viaje", "datos"), { itinerary: initialItinerary, checklist: initialChecklist });
-      alert("¡Nube actualizada! Las rutas GPS del mapa están listas.");
+    if(window.confirm("¿Sobreescribir la base de datos de la nube con la nueva Súper Ruta y las tiendas extra? (Tus check-ins NO se borrarán)")) {
+      const mergedChecklist = initialChecklist.map(initItem => {
+        const existingItem = checklist.find(c => c.id === initItem.id);
+        return existingItem ? { ...initItem, completed: existingItem.completed } : initItem;
+      });
+      await setDoc(doc(db, "viaje", "datos"), { itinerary: initialItinerary, checklist: mergedChecklist });
+      alert("¡Nube actualizada! Tienes la Súper Ruta instalada.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-800 font-sans pb-10">
-      <div className="sticky top-0 z-20 bg-white border-b border-slate-100 pt-safe">
-        <div className="max-w-md mx-auto">
-          <div className="px-5 py-4 flex items-center justify-between">
-            <h1 className="text-xl font-black text-slate-900 tracking-tighter italic">🎌 JAPAN 2026</h1>
-            <div className="flex gap-2">
-              <button onClick={forceUpdateCloud} className="text-[9px] font-bold px-3 py-1 bg-rose-100 text-rose-700 rounded-full animate-bounce border border-rose-200 shadow-sm active:scale-95">
-                🔄 FORZAR NUBE
-              </button>
-              <span className="text-[9px] font-bold px-3 py-1 bg-green-50 text-green-600 rounded-full animate-pulse border border-green-100">☁️ Sincronizado</span>
+    <div className={`${isDarkMode ? 'dark' : ''} touch-pan-y`}>
+      <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans pb-10 transition-colors duration-300">
+        <div className="sticky top-0 z-20 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 pt-safe">
+          <div className="max-w-md mx-auto">
+            <div className="px-5 py-4 flex items-center justify-between">
+              <h1 className="text-xl font-black tracking-tighter italic flex items-center gap-2">
+                🎌 JAPAN 2026
+              </h1>
+              <div className="flex gap-2 items-center">
+                <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                  {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
+                </button>
+                <span className="text-[9px] font-bold px-3 py-1 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full animate-pulse border border-green-100 dark:border-green-800">☁️ Sincronizado</span>
+              </div>
             </div>
-          </div>
-          <div className="flex px-3 pb-2 justify-between">
-            {[ { id: 'resumen', icon: Home, label: 'Info' }, { id: 'mapa', icon: MapPin, label: 'Mapa' }, { id: 'itinerario', icon: Map, label: 'Ruta' }, { id: 'reservas', icon: CheckSquare, label: 'Check' } ].map((item) => (
-              <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center justify-center gap-1.5 py-3 w-20 rounded-[20px] transition-all duration-300 ${activeTab === item.id ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-50'}`}>
-                <item.icon className="w-5 h-5" />
-                <span className="text-[8px] font-black uppercase tracking-widest">{item.label}</span>
-              </button>
-            ))}
+            
+            {/* NUEVO ORDEN DE PESTAÑAS: Info -> Ruta -> Mapa -> Check */}
+            <div className="flex px-3 pb-2 justify-between">
+              {[ { id: 'resumen', icon: Home, label: 'Info' }, { id: 'itinerario', icon: Map, label: 'Ruta' }, { id: 'mapa', icon: MapPin, label: 'Mapa' }, { id: 'reservas', icon: CheckSquare, label: 'Check' } ].map((item) => (
+                <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center justify-center gap-1.5 py-3 w-20 rounded-[20px] transition-all duration-300 ${activeTab === item.id ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900'}`}>
+                  <item.icon className="w-5 h-5" />
+                  <span className="text-[8px] font-black uppercase tracking-widest">{item.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      <main className="max-w-md mx-auto p-4 mt-2">
-        
-        {/* PESTAÑA INFO */}
-        {activeTab === 'resumen' && (
-          <div className="space-y-4 animate-in fade-in duration-300">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-slate-50 rounded-[28px] p-5">
-                <Moon className="w-5 h-5 text-indigo-500 mb-2" />
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Noches</p>
-                <p className="text-xl font-black text-slate-900">13 (JP)</p>
+        <main className="max-w-md mx-auto p-4 mt-2">
+          
+          {/* PESTAÑA INFO (RESUMEN + SUPERVIVENCIA + TIENDAS) */}
+          {activeTab === 'resumen' && (
+            <div className="space-y-4 animate-in fade-in duration-300">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-slate-50 dark:bg-slate-900 rounded-[28px] p-5">
+                  <Moon className="w-5 h-5 text-indigo-500 mb-2" />
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Noches</p>
+                  <p className="text-xl font-black">13 (JP)</p>
+                </div>
+                <div className="bg-slate-50 dark:bg-slate-900 rounded-[28px] p-5">
+                  <Zap className="w-5 h-5 text-amber-500 mb-2" />
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Bases</p>
+                  <p className="text-xl font-black">TKY/OSK</p>
+                </div>
               </div>
-              <div className="bg-slate-50 rounded-[28px] p-5">
-                <Zap className="w-5 h-5 text-amber-500 mb-2" />
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Bases</p>
-                <p className="text-xl font-black text-slate-900">TKY/OSK</p>
+
+              <div className="bg-rose-50 dark:bg-rose-900/20 rounded-[28px] p-6 border border-rose-100 dark:border-rose-900/30">
+                 <h3 className="font-black text-base mb-4 text-rose-900 dark:text-rose-300 flex items-center gap-2"><Lightbulb className="w-5 h-5" /> Tips de Supervivencia</h3>
+                 <ul className="text-xs text-rose-800 dark:text-rose-200/80 space-y-3 font-medium">
+                   <li>• <strong>Maletas (Yamato Takkyubin):</strong> Viajar ligeros en Shinkansen. Enviar maletas grandes desde el hotel de Tokio al de Osaka un día antes (aprox ¥2,500 / ~$65,000 COP).</li>
+                   <li>• <strong>Cultura de Basura y Comida:</strong> No está prohibido comer en la calle, pero es mal visto caminar y comer a la vez; mejor hacerlo a un lado del puesto. Hay muy pocos basureros públicos, llevar bolsita en la mochila.</li>
+                   <li>• <strong>Compras Tax-Free:</strong> Aplica en compras desde ¥5,000 (~$130,000 COP) sin impuestos. Llevar pasaporte físico siempre en la mochila.</li>
+                 </ul>
+              </div>
+
+              <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-[28px] p-6 border border-emerald-100 dark:border-emerald-900/30">
+                 <h3 className="font-black text-base mb-4 text-emerald-900 dark:text-emerald-300 flex items-center gap-2"><ShoppingBag className="w-5 h-5" /> Tiendas Económicas & Skincare</h3>
+                 <ul className="text-xs text-emerald-800 dark:text-emerald-200/80 space-y-3 font-medium">
+                   <li>• <strong>Matsumoto Kiyoshi:</strong> Farmacia gigante, ideal para skincare, cosméticos japoneses y dulces a precios insuperables.</li>
+                   <li>• <strong>Las Tiendas de 100 Yenes (~$2,600 COP):</strong> <em>Daiso</em>, <em>Seria</em>, <em>Can*Do</em> y <em>Watts</em>. Excelentes para souvenirs, papelería y chucherías bellísimas.</li>
+                   <li>• <strong>Lawson Store 100:</strong> Como un mini-súper, pero casi toda la comida y snacks valen 100 yenes. Salva vidas.</li>
+                   <li>• <strong>GU y Uniqlo:</strong> Ropa de calidad a precios bajísimos (GU es la hermana menor y más barata de Uniqlo).</li>
+                   <li>• <strong>Natural Kitchen:</strong> Cositas de hogar y cocina preciosas estilo japonés, súper económicas.</li>
+                 </ul>
+              </div>
+
+              <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-[28px] p-6 border border-indigo-100 dark:border-indigo-900/30">
+                 <h3 className="font-black text-base mb-3 text-indigo-900 dark:text-indigo-300 flex items-center gap-2"><BookOpen className="w-5 h-5" /> Goshuincho Tip</h3>
+                 <p className="text-xs text-indigo-800 dark:text-indigo-200/80 leading-relaxed font-medium">Comprar el libro de sellos (Goshuincho) el primer día en Senso-ji. En cada templo, los monjes pintarán una caligrafía única por ¥300-¥500 (~$8,000 - $13,000 COP). ⛩️</p>
               </div>
             </div>
+          )}
 
-            <div className="bg-rose-50 rounded-[28px] p-6 border border-rose-100">
-               <h3 className="font-black text-base mb-4 text-rose-900 flex items-center gap-2"><Lightbulb className="w-5 h-5" /> Tips de Supervivencia</h3>
-               <ul className="text-xs text-rose-800 space-y-3 font-medium">
-                 <li>• <strong>Maletas (Yamato Takkyubin):</strong> Viajen ligeros en el Shinkansen. Es súper recomendado enviar las maletas grandes desde el hotel de Tokio al de Osaka un día antes (aprox ¥2500).</li>
-                 <li>• <strong>Suica en el Celular:</strong> Si tienen iPhone, agreguen la tarjeta Suica a su Apple Wallet desde su país. Se recarga en 2 segundos con Apple Pay y los salva de hacer filas en las máquinas de metro.</li>
-                 <li>• <strong>Cultura de Basura:</strong> En Japón no se come caminando por la calle y es casi imposible encontrar basureros públicos. Lleven siempre una bolsita en la mochila para guardar sus empaques.</li>
-                 <li>• <strong>Compras Tax-Free:</strong> Lleven su pasaporte físico (no foto) siempre encima. En compras mayores a ¥5,000 en la mayoría de tiendas grandes, les descuentan el 10% de impuestos al pagar.</li>
-               </ul>
-            </div>
-
-            <div className="bg-indigo-50 rounded-[28px] p-6 border border-indigo-100">
-               <h3 className="font-black text-base mb-3 text-indigo-900 flex items-center gap-2"><BookOpen className="w-5 h-5" /> Goshuincho Tip</h3>
-               <p className="text-xs text-indigo-800 leading-relaxed font-medium">Comprar el libro de sellos (Goshuincho) el primer día en el Templo Senso-ji. En cada templo o santuario, los monjes harán una caligrafía única a mano por ¥300-¥500. Es el recuerdo más lindo del viaje. ⛩️</p>
-            </div>
-
-            <div className="bg-emerald-50 rounded-[28px] p-6 border border-emerald-100">
-               <h3 className="font-black text-base mb-4 text-emerald-900 flex items-center gap-2"><ShoppingBag className="w-5 h-5" /> Compras Rápidas</h3>
-               <ul className="text-xs text-emerald-800 space-y-3 font-medium">
-                 <li>• <strong>Yamashiroya (Ueno):</strong> 6 pisos inmensos de juguetes, Ghibli y casitas en miniatura japonesas.</li>
-                 <li>• <strong>Don Quijote (Donki):</strong> La cadena que abre 24h. Ideal para comprar KitKats raros de matcha y souvenirs a las 11 de la noche.</li>
-                 <li>• <strong>Uniqlo (Ginza):</strong> 12 pisos enteros de ropa. El más grande del mundo.</li>
-               </ul>
-            </div>
-          </div>
-        )}
-
-        {/* NUEVA PESTAÑA MAPA INTERACTIVO (DÍA POR DÍA) */}
-        {activeTab === 'mapa' && (
-          <div className="space-y-4 animate-in fade-in duration-300 flex flex-col h-[650px]">
-            <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
-              {itinerary.filter(day => !day.id.includes('v') && day.id !== 'd15').map((day) => {
+          {/* RUTA */}
+          {activeTab === 'itinerario' && (
+            <div className="space-y-4 pb-10">
+              {itinerary.map((day) => {
                 const theme = themeStyles[day.theme];
+                const isExpanded = expandedDays.includes(day.id);
+                
                 return (
-                  <button 
-                    key={day.id} 
-                    onClick={() => setSelectedMapDay(day.id)}
-                    className={`flex-shrink-0 px-5 py-3 rounded-2xl text-[12px] font-black uppercase tracking-tight transition-all active:scale-95 ${selectedMapDay === day.id ? 'bg-slate-900 text-white shadow-md' : `${theme.bg} ${theme.text} hover:opacity-80`}`}
-                  >
-                    📍 {day.date}
-                  </button>
-                )
+                  <div key={day.id} className="transition-all duration-300">
+                    <button onClick={() => setExpandedDays(prev => isExpanded ? prev.filter(i => i !== day.id) : [...prev, day.id])} className={`w-full flex items-center justify-between p-4 rounded-[24px] transition-all duration-300 ${isExpanded ? 'bg-slate-50 dark:bg-slate-900 mb-2' : theme.bg}`}>
+                      <div className="flex items-center gap-4 text-left">
+                        <div className={`px-4 py-2 rounded-[16px] ${theme.pillBg} ${theme.text} text-[11px] font-black tracking-tight`}>{day.date}</div>
+                        <span className={`font-black text-[13px] ${theme.text} uppercase tracking-tighter`}>{day.region}</span>
+                      </div>
+                      {isExpanded ? <ChevronUp className={`w-5 h-5 ${theme.text} opacity-50`} /> : <ChevronDown className={`w-5 h-5 ${theme.text} opacity-50`} />}
+                    </button>
+                    
+                    {isExpanded && (
+                      <div className="px-4 pb-6 pt-2 animate-in slide-in-from-top-2">
+                        <div className="mb-6">
+                           <p className="text-[14px] font-black italic">"{day.mainActivity}"</p>
+                        </div>
+                        
+                        <div className="space-y-0">
+                          {day.activities.map((act) => (
+                            <div key={act.id} className="relative pl-6 border-l-2 border-slate-100 dark:border-slate-800 ml-2 pb-6 last:pb-0 text-left">
+                              <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full ${theme.dot} border-[3px] border-white dark:border-slate-950 shadow-sm`} />
+                              
+                              <div className="mb-1">
+                                <span className={`text-[11px] font-black ${theme.text} uppercase tracking-tight block mb-0.5`}>{act.time}</span>
+                                <span className="font-black text-[13px] leading-tight uppercase">{act.name}</span>
+                              </div>
+                              
+                              {act.hours && <p className="text-[10px] font-bold text-slate-400 mt-1 tracking-tight">⏱️ {act.hours}</p>}
+                              <p className="text-[12px] text-slate-600 dark:text-slate-400 font-medium leading-relaxed mt-2">{act.notes}</p>
+                              
+                              {act.link && (
+                                <a 
+                                  href={act.link} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  className={`inline-flex items-center gap-1 mt-3 text-[11px] font-black ${theme.text} ${theme.pillBg} px-4 py-2 rounded-xl hover:opacity-80 transition-all shadow-sm active:scale-95`}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {act.linkLabel} 🔗
+                                </a>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
               })}
             </div>
-            
-            <div className="flex-1 rounded-[32px] overflow-hidden border border-slate-200 shadow-sm bg-slate-100 relative">
-              <iframe 
-                title="Mapa de Rutas Diarias"
-                src={`https://maps.google.com/maps?${itinerary.find(d => d.id === selectedMapDay)?.routeQuery}&output=embed`}
-                className="absolute inset-0 w-full h-full border-0"
-                allowFullScreen=""
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              ></iframe>
-            </div>
-            
-            <div className="bg-slate-50 p-4 rounded-[20px] text-center border border-slate-100">
-              <p className="text-[12px] text-slate-700 font-black uppercase italic mb-1">
-                {itinerary.find(d => d.id === selectedMapDay)?.mainActivity}
-              </p>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest italic">
-                Desliza los botones arriba para cambiar de día
-              </p>
-            </div>
-          </div>
-        )}
+          )}
 
-        {/* RUTA (INTACTO) */}
-        {activeTab === 'itinerario' && (
-          <div className="space-y-4 pb-10">
-            {itinerary.map((day) => {
-              const theme = themeStyles[day.theme];
-              const isExpanded = expandedDays.includes(day.id);
+          {/* MAPA INTERACTIVO CARGADO DESDE ARRIBA */}
+          {activeTab === 'mapa' && (
+            <div className="space-y-4 animate-in fade-in duration-300 flex flex-col h-[70vh] min-h-[500px] justify-start">
+              <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                {itinerary.filter(day => !day.id.includes('v') && day.id !== 'd15').map((day) => {
+                  const theme = themeStyles[day.theme];
+                  return (
+                    <button 
+                      key={day.id} 
+                      onClick={() => setSelectedMapDay(day.id)}
+                      className={`flex-shrink-0 px-5 py-3 rounded-2xl text-[12px] font-black uppercase tracking-tight transition-all active:scale-95 ${selectedMapDay === day.id ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-md' : `${theme.bg} ${theme.text} hover:opacity-80`}`}
+                    >
+                      📍 {day.date}
+                    </button>
+                  )
+                })}
+              </div>
               
-              return (
-                <div key={day.id} className="transition-all duration-300">
-                  <button onClick={() => setExpandedDays(prev => isExpanded ? prev.filter(i => i !== day.id) : [...prev, day.id])} className={`w-full flex items-center justify-between p-4 rounded-[24px] transition-all duration-300 ${isExpanded ? 'bg-slate-50 mb-2' : theme.bg}`}>
-                    <div className="flex items-center gap-4 text-left">
-                      <div className={`px-4 py-2 rounded-[16px] ${theme.pillBg} ${theme.text} text-[11px] font-black tracking-tight`}>{day.date}</div>
-                      <span className={`font-black text-[13px] ${theme.text} uppercase tracking-tighter`}>{day.region}</span>
-                    </div>
-                    {isExpanded ? <ChevronUp className={`w-5 h-5 ${theme.text} opacity-50`} /> : <ChevronDown className={`w-5 h-5 ${theme.text} opacity-50`} />}
-                  </button>
-                  
-                  {isExpanded && (
-                    <div className="px-4 pb-6 pt-2 animate-in slide-in-from-top-2">
-                      <div className="mb-6">
-                         <p className="text-[14px] font-black text-slate-800 italic">"{day.mainActivity}"</p>
-                      </div>
-                      
-                      <div className="space-y-0">
-                        {day.activities.map((act) => (
-                          <div key={act.id} className="relative pl-6 border-l-2 border-slate-100 ml-2 pb-6 last:pb-0 text-left">
-                            <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full ${theme.dot} border-[3px] border-white shadow-sm`} />
-                            
-                            <div className="mb-1">
-                              <span className={`text-[11px] font-black ${theme.text} uppercase tracking-tight block mb-0.5`}>{act.time}</span>
-                              <span className="font-black text-[13px] text-slate-800 leading-tight uppercase">{act.name}</span>
-                            </div>
-                            
-                            {act.hours && <p className="text-[10px] font-bold text-slate-400 mt-1 tracking-tight">⏱️ {act.hours}</p>}
-                            <p className="text-[12px] text-slate-600 font-medium leading-relaxed mt-2">{act.notes}</p>
-                            
-                            {act.link && (
-                              <a 
-                                href={act.link} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className={`inline-flex items-center gap-1 mt-3 text-[11px] font-black ${theme.text} ${theme.pillBg} px-4 py-2 rounded-xl hover:opacity-80 transition-all shadow-sm active:scale-95`}
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {act.linkLabel} 🔗
-                              </a>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* CHECK (INTACTO) */}
-        {activeTab === 'reservas' && (
-          <div className="space-y-8 pb-24 animate-in fade-in duration-300">
-            <div className="bg-slate-50 rounded-[32px] p-6">
-               <h3 className="font-black text-slate-900 text-sm uppercase mb-4 flex items-center gap-2"><Building className="w-5 h-5 text-indigo-500" /> Hospedajes</h3>
-               <div className="space-y-2">
-                 {checklist.filter(i => i.category === 'hospedaje').map(item => (
-                   <label key={item.id} className="flex items-center gap-4 p-4 bg-white rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
-                     <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-indigo-600 checked:bg-indigo-600 transition-all" />
-                     <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'}`}>{item.text}</span>
-                   </label>
-                 ))}
-               </div>
+              <div className="flex-1 rounded-[32px] overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm bg-slate-100 dark:bg-slate-900 relative">
+                <iframe 
+                  title="Mapa de Rutas Diarias"
+                  src={`https://maps.google.com/maps?${itinerary.find(d => d.id === selectedMapDay)?.routeQuery}&output=embed`}
+                  className="absolute inset-0 w-full h-full border-0"
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+              </div>
+              
+              <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-[20px] text-center border border-slate-100 dark:border-slate-800">
+                <p className="text-[12px] font-black uppercase italic mb-1">
+                  {itinerary.find(d => d.id === selectedMapDay)?.mainActivity}
+                </p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest italic">
+                  Desliza los botones arriba para cambiar de día
+                </p>
+              </div>
             </div>
+          )}
 
-            <div className="bg-slate-50 rounded-[32px] p-6">
-               <h3 className="font-black text-slate-900 text-sm uppercase mb-4 flex items-center gap-2"><Train className="w-5 h-5 text-rose-500" /> Transportes y Trámites</h3>
-               <div className="space-y-2">
-                 {checklist.filter(i => i.category === 'transporte').map(item => (
-                   <label key={item.id} className="flex items-center gap-4 p-4 bg-white rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
-                     <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-rose-600 checked:bg-rose-600 transition-all" />
-                     <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'}`}>{item.text}</span>
-                   </label>
-                 ))}
-               </div>
-               <div className="mt-4 p-4 bg-rose-100/50 rounded-[20px] flex gap-3 text-left border border-rose-200">
-                  <AlertTriangle className="w-5 h-5 text-rose-500 flex-shrink-0" />
-                  <p className="text-[11px] font-medium text-rose-800 leading-relaxed"><strong>¡Atención!</strong> Los tickets de trenes bala (App SmartEX) y buses de larga distancia (Highway Bus al Fuji) se habilitan para comprar exactamente <strong>30 días antes</strong> de la fecha del viaje.</p>
-               </div>
+          {/* CHECK */}
+          {activeTab === 'reservas' && (
+            <div className="space-y-8 pb-24 animate-in fade-in duration-300">
+              <div className="bg-slate-50 dark:bg-slate-900 rounded-[32px] p-6">
+                 <h3 className="font-black text-sm uppercase mb-4 flex items-center gap-2"><Building className="w-5 h-5 text-indigo-500" /> Hospedajes</h3>
+                 <div className="space-y-2">
+                   {checklist.filter(i => i.category === 'hospedaje').map(item => (
+                     <label key={item.id} className="flex items-center gap-4 p-4 bg-white dark:bg-slate-950 rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
+                       <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-indigo-600 checked:bg-indigo-600 dark:border-slate-700 transition-all" />
+                       <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 dark:text-slate-600 line-through' : ''}`}>{item.text}</span>
+                     </label>
+                   ))}
+                 </div>
+              </div>
+
+              <div className="bg-slate-50 dark:bg-slate-900 rounded-[32px] p-6">
+                 <h3 className="font-black text-sm uppercase mb-4 flex items-center gap-2"><Train className="w-5 h-5 text-rose-500" /> Transportes y Trámites</h3>
+                 <div className="space-y-2">
+                   {checklist.filter(i => i.category === 'transporte').map(item => (
+                     <label key={item.id} className="flex items-center gap-4 p-4 bg-white dark:bg-slate-950 rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
+                       <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-rose-600 checked:bg-rose-600 dark:border-slate-700 transition-all" />
+                       <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 dark:text-slate-600 line-through' : ''}`}>{item.text}</span>
+                     </label>
+                   ))}
+                 </div>
+                 <div className="mt-4 p-4 bg-rose-100/50 dark:bg-rose-900/20 rounded-[20px] flex gap-3 text-left border border-rose-200 dark:border-rose-900/30">
+                    <AlertTriangle className="w-5 h-5 text-rose-500 flex-shrink-0" />
+                    <p className="text-[11px] font-medium text-rose-800 dark:text-rose-200/80 leading-relaxed"><strong>¡Atención!</strong> Tickets de Shinkansen y Highway Bus al Fuji se habilitan para comprar exactamente <strong>30 días antes</strong>.</p>
+                 </div>
+              </div>
+
+              <div className="bg-slate-50 dark:bg-slate-900 rounded-[32px] p-6">
+                 <h3 className="font-black text-sm uppercase mb-4 flex items-center gap-2"><Ticket className="w-5 h-5 text-emerald-500" /> Atracciones</h3>
+                 <div className="space-y-2">
+                   {checklist.filter(i => i.category === 'atraccion').map(item => (
+                     <label key={item.id} className="flex items-center gap-4 p-4 bg-white dark:bg-slate-950 rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
+                       <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-emerald-600 checked:bg-emerald-600 dark:border-slate-700 transition-all" />
+                       <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 dark:text-slate-600 line-through' : ''}`}>{item.text}</span>
+                     </label>
+                   ))}
+                 </div>
+                 <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-[20px] flex gap-3 text-left border border-amber-200 dark:border-amber-900/30">
+                    <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                    <p className="text-[11px] font-medium text-amber-800 dark:text-amber-200/80 leading-relaxed"><strong>Advertencia Extrema:</strong> Las reservas para Shibuya Sky y Pokémon Café vuelan. Poner alarma <strong>4 semanas antes a las 6:00 PM (hora JP)</strong>.</p>
+                 </div>
+              </div>
             </div>
+          )}
+        </main>
+        
+        {/* BOTÓN FLOTANTE "FORZAR NUBE" (Solo ícono) */}
+        <button 
+          onClick={forceUpdateCloud} 
+          className="fixed bottom-6 right-6 z-50 w-12 h-12 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all"
+          title="Sincronizar base de datos"
+        >
+          <CloudCog className="w-6 h-6" />
+        </button>
 
-            <div className="bg-slate-50 rounded-[32px] p-6">
-               <h3 className="font-black text-slate-900 text-sm uppercase mb-4 flex items-center gap-2"><Ticket className="w-5 h-5 text-emerald-500" /> Atracciones</h3>
-               <div className="space-y-2">
-                 {checklist.filter(i => i.category === 'atraccion').map(item => (
-                   <label key={item.id} className="flex items-center gap-4 p-4 bg-white rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
-                     <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-emerald-600 checked:bg-emerald-600 transition-all" />
-                     <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'}`}>{item.text}</span>
-                   </label>
-                 ))}
-               </div>
-               <div className="mt-4 p-4 bg-amber-50 rounded-[20px] flex gap-3 text-left border border-amber-200">
-                  <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
-                  <p className="text-[11px] font-medium text-amber-800 leading-relaxed"><strong>Advertencia Nivel Extremo:</strong> Las reservas para Shibuya Sky y Pokémon Café vuelan en minutos. Pongan una alarma <strong>4 semanas antes a las 6:00 PM (hora de Japón)</strong>.</p>
-               </div>
-            </div>
-
-          </div>
-        )}
-      </main>
+      </div>
+      <style dangerouslySetContent={{__html: `
+        .touch-pan-y { touch-action: pan-y pinch-zoom; }
+      `}} />
     </div>
   );
 }
