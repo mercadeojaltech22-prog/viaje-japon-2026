@@ -177,18 +177,18 @@ const initialItinerary = [
   }
 ];
 
-// --- LISTA DE CHEQUEO ---
+// --- LISTA DE CHEQUEO TOTALMENTE A PRUEBA DE BOBOS ---
 const initialChecklist = [
-  { id: 'c_h1', category: 'hospedaje', text: 'Hotel Tokio 1 (Ueno) - 15 Mayo', completed: true },
-  { id: 'c_h2', category: 'hospedaje', text: 'Hotel Osaka (Namba) - 16-23 Mayo', completed: true },
-  { id: 'c_h3', category: 'hospedaje', text: 'Hotel Tokio 2 (Ueno) - 23-25 Mayo', completed: true },
-  { id: 'c_h4', category: 'hospedaje', text: 'Hotel Tokio 3 (Ueno) - 25-28 Mayo', completed: true },
+  { id: 'c_h1', category: 'hospedaje', text: 'Hotel Tokio 1 (Ueno) - 15 Mayo (1 Noche, 5 Personas)', completed: true },
+  { id: 'c_h2', category: 'hospedaje', text: 'Hotel Osaka (Namba) - 16 al 23 Mayo (7 Noches, 5 Personas)', completed: true },
+  { id: 'c_h3', category: 'hospedaje', text: 'Hotel Tokio 2 (Ueno) - 23 al 25 Mayo (2 Noches, 5 Personas)', completed: true },
+  { id: 'c_h4', category: 'hospedaje', text: 'Hotel Tokio 3 (Ueno) - 25 al 28 Mayo (3 Noches, 3 Personas)', completed: true },
   
   { id: 'c_v1', category: 'transporte', text: 'Vuelos Ida (MDE-MEX-NRT)', completed: true },
   { id: 'c_v2', category: 'transporte', text: 'Vuelos Regreso (NRT-ICN-MEX-MDE)', completed: true },
   { id: 'c_t1', category: 'transporte', text: 'Shinkansen: Tokio → Osaka', completed: false },
-  { id: 'c_t2', category: 'transporte', text: 'Bus Highway: Kawaguchiko → Shinjuku', completed: false },
-  { id: 'c_t4', category: 'transporte', text: 'Tren Narita Express o Keisei Skyliner', completed: false },
+  { id: 'c_t2', category: 'transporte', text: 'Bus de Larga Distancia (Highway Bus): Kawaguchiko → Shinjuku', completed: false },
+  { id: 'c_t4', category: 'transporte', text: 'Tren Keisei Skyliner (Aeropuerto Narita ↔ Tokio)', completed: false },
   { id: 'c_t3', category: 'transporte', text: 'Permiso K-ETA (Corea del Sur)', completed: false },
   
   { id: 'c_a1', category: 'atraccion', text: 'Ghibli Park - OK', completed: true },
@@ -213,7 +213,6 @@ export default function App() {
   const [selectedMapDay, setSelectedMapDay] = useState('d1');
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Inyectar estilos para evitar zoom elástico y ajustar fondo
   useEffect(() => {
     let meta = document.querySelector('meta[name="viewport"]');
     if (!meta) {
@@ -248,17 +247,16 @@ export default function App() {
   };
 
   const forceUpdateCloud = async () => {
-    if(window.confirm("¿Forzar actualización de datos en la nube?")) {
+    if(window.confirm("¿Forzar actualización de datos en la nube para ver los hospedajes con noches y personas?")) {
       const mergedChecklist = initialChecklist.map(initItem => {
         const existingItem = checklist.find(c => c.id === initItem.id);
         return existingItem ? { ...initItem, completed: existingItem.completed } : initItem;
       });
       await setDoc(doc(db, "viaje", "datos"), { itinerary: initialItinerary, checklist: mergedChecklist });
-      alert("¡Nube actualizada!");
+      alert("¡Nube actualizada y a prueba de bobos!");
     }
   };
 
-  // ESTILOS DINÁMICOS
   const getTheme = (themeName) => {
     if (themeName === 'blue') return { bg: isDarkMode ? 'bg-blue-900/30' : 'bg-blue-100', text: isDarkMode ? 'text-blue-300' : 'text-blue-900', pillBg: isDarkMode ? 'bg-blue-800/50' : 'bg-blue-200', dot: 'bg-blue-500' };
     if (themeName === 'emerald') return { bg: isDarkMode ? 'bg-emerald-900/30' : 'bg-emerald-100', text: isDarkMode ? 'text-emerald-300' : 'text-emerald-900', pillBg: isDarkMode ? 'bg-emerald-800/50' : 'bg-emerald-200', dot: 'bg-emerald-500' };
@@ -327,7 +325,6 @@ export default function App() {
 
             <div className={`rounded-[28px] p-6 border ${isDarkMode ? 'bg-emerald-900/20 border-emerald-900/30' : 'bg-emerald-50 border-emerald-100'}`}>
                <h3 className={`font-black text-base mb-4 flex items-center gap-2 ${isDarkMode ? 'text-emerald-300' : 'text-emerald-900'}`}><ShoppingBag className="w-5 h-5" /> Tiendas Económicas & Skincare</h3>
-               
                <ul className={`text-xs space-y-3 font-medium ${isDarkMode ? 'text-emerald-200/80' : 'text-emerald-800'}`}>
                  <li>• <strong>Matsumoto Kiyoshi:</strong> Farmacia gigante, ideal para skincare, cosméticos japoneses y dulces a precios insuperables.</li>
                  <li>• <strong>Las Tiendas de 100 Yenes (~$2,600 COP):</strong> <em>Daiso</em>, <em>Seria</em>, <em>Can*Do</em> y <em>Watts</em>. Excelentes para souvenirs, papelería y chucherías bellísimas.</li>
@@ -342,7 +339,6 @@ export default function App() {
                <p className={`text-xs leading-relaxed font-medium ${isDarkMode ? 'text-indigo-200/80' : 'text-indigo-800'}`}>Comprar el libro de sellos (Goshuincho) el primer día en Senso-ji. En cada templo, los monjes pintarán una caligrafía única por ¥300-¥500 (~$8,000 - $13,000 COP). ⛩️</p>
             </div>
 
-            {/* BOTÓN FORZAR NUBE SÚPER SUTIL */}
             <div className="pt-8 flex justify-end">
               <button 
                 onClick={forceUpdateCloud} 
@@ -481,7 +477,7 @@ export default function App() {
                </div>
                <div className={`mt-4 p-4 rounded-[20px] flex gap-3 text-left border ${isDarkMode ? 'bg-rose-900/20 border-rose-900/30' : 'bg-rose-100/50 border-rose-200'}`}>
                   <AlertTriangle className="w-5 h-5 text-rose-500 flex-shrink-0" />
-                  <p className={`text-[11px] font-medium leading-relaxed ${isDarkMode ? 'text-rose-200/80' : 'text-rose-800'}`}><strong>¡Atención!</strong> Tickets de Shinkansen y Highway Bus al Fuji se habilitan para comprar exactamente <strong>30 días antes</strong>.</p>
+                  <p className={`text-[11px] font-medium leading-relaxed ${isDarkMode ? 'text-rose-200/80' : 'text-rose-800'}`}><strong>¡Atención!</strong> Tickets de Shinkansen y buses de larga distancia (Highway Bus al Fuji) se habilitan para comprar exactamente <strong>30 días antes</strong>.</p>
                </div>
             </div>
 
