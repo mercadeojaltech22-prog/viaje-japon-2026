@@ -177,7 +177,6 @@ const initialItinerary = [
   }
 ];
 
-// --- LISTA DE CHEQUEO ---
 const initialChecklist = [
   { id: 'c_h1', category: 'hospedaje', text: 'Hotel Tokio 1 (Ueno) - 15 Mayo', completed: true },
   { id: 'c_h2', category: 'hospedaje', text: 'Hotel Osaka (Namba) - 16-23 Mayo', completed: true },
@@ -199,12 +198,6 @@ const initialChecklist = [
   { id: 'c_a6', category: 'atraccion', text: 'Tokyo Skytree', completed: false }
 ];
 
-const themeStyles = {
-  blue: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-900 dark:text-blue-300', pillBg: 'bg-blue-200 dark:bg-blue-800/50', dot: 'bg-blue-500' },
-  emerald: { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-900 dark:text-emerald-300', pillBg: 'bg-emerald-200 dark:bg-emerald-800/50', dot: 'bg-emerald-500' },
-  rose: { bg: 'bg-rose-100 dark:bg-rose-900/30', text: 'text-rose-900 dark:text-rose-300', pillBg: 'bg-rose-200 dark:bg-rose-800/50', dot: 'bg-rose-500' }
-};
-
 export default function App() {
   const [activeTab, setActiveTab] = useState('resumen');
   const [itinerary, setItinerary] = useState(initialItinerary);
@@ -212,6 +205,19 @@ export default function App() {
   const [expandedDays, setExpandedDays] = useState([]);
   const [selectedMapDay, setSelectedMapDay] = useState('d1');
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Inyectar etiquetas para evitar zoom y pintar fondo
+  useEffect(() => {
+    let meta = document.querySelector('meta[name="viewport"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.name = 'viewport';
+      document.head.appendChild(meta);
+    }
+    meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+    
+    document.body.style.backgroundColor = isDarkMode ? '#020617' : '#f8fafc';
+  }, [isDarkMode]);
 
   useEffect(() => {
     const unsub = onSnapshot(doc(db, "viaje", "datos"), (docSnap) => {
@@ -235,253 +241,259 @@ export default function App() {
   };
 
   const forceUpdateCloud = async () => {
-    if(window.confirm("¿Sobreescribir la base de datos de la nube con la nueva Súper Ruta y las tiendas extra? (Tus check-ins NO se borrarán)")) {
+    if(window.confirm("¿Forzar guardado en nube?")) {
       const mergedChecklist = initialChecklist.map(initItem => {
         const existingItem = checklist.find(c => c.id === initItem.id);
         return existingItem ? { ...initItem, completed: existingItem.completed } : initItem;
       });
       await setDoc(doc(db, "viaje", "datos"), { itinerary: initialItinerary, checklist: mergedChecklist });
-      alert("¡Nube actualizada! Tienes la Súper Ruta instalada.");
+      alert("¡Listo!");
     }
   };
 
+  // ESTILOS DINÁMICOS PUROS SIN DEPENDER DE TAILWIND CONFIG
+  const getTheme = (themeName) => {
+    if (themeName === 'blue') return { bg: isDarkMode ? 'bg-blue-900/30' : 'bg-blue-100', text: isDarkMode ? 'text-blue-300' : 'text-blue-900', pillBg: isDarkMode ? 'bg-blue-800/50' : 'bg-blue-200', dot: 'bg-blue-500' };
+    if (themeName === 'emerald') return { bg: isDarkMode ? 'bg-emerald-900/30' : 'bg-emerald-100', text: isDarkMode ? 'text-emerald-300' : 'text-emerald-900', pillBg: isDarkMode ? 'bg-emerald-800/50' : 'bg-emerald-200', dot: 'bg-emerald-500' };
+    return { bg: isDarkMode ? 'bg-rose-900/30' : 'bg-rose-100', text: isDarkMode ? 'text-rose-300' : 'text-rose-900', pillBg: isDarkMode ? 'bg-rose-800/50' : 'bg-rose-200', dot: 'bg-rose-500' };
+  };
+
+  const bgApp = isDarkMode ? 'bg-slate-950' : 'bg-white';
+  const textApp = isDarkMode ? 'text-slate-200' : 'text-slate-800';
+  const bgCard = isDarkMode ? 'bg-slate-900' : 'bg-slate-50';
+  const borderApp = isDarkMode ? 'border-slate-800' : 'border-slate-100';
+  const borderCard = isDarkMode ? 'border-slate-800' : 'border-slate-200';
+
   return (
-    <div className={`${isDarkMode ? 'dark' : ''} touch-pan-y`}>
-      <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans pb-10 transition-colors duration-300">
-        <div className="sticky top-0 z-20 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 pt-safe">
-          <div className="max-w-md mx-auto">
-            <div className="px-5 py-4 flex items-center justify-between">
-              <h1 className="text-xl font-black tracking-tighter italic flex items-center gap-2">
-                🎌 JAPAN 2026
-              </h1>
-              <div className="flex gap-2 items-center">
-                <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                  {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
-                </button>
-                <span className="text-[9px] font-bold px-3 py-1 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full animate-pulse border border-green-100 dark:border-green-800">☁️ Sincronizado</span>
-              </div>
-            </div>
-            
-            <div className="flex px-3 pb-2 justify-between">
-              {[ { id: 'resumen', icon: Home, label: 'Info' }, { id: 'itinerario', icon: Map, label: 'Ruta' }, { id: 'mapa', icon: MapPin, label: 'Mapa' }, { id: 'reservas', icon: CheckSquare, label: 'Check' } ].map((item) => (
-                <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center justify-center gap-1.5 py-3 w-20 rounded-[20px] transition-all duration-300 ${activeTab === item.id ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg' : 'text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900'}`}>
-                  <item.icon className="w-5 h-5" />
-                  <span className="text-[8px] font-black uppercase tracking-widest">{item.label}</span>
-                </button>
-              ))}
+    <div className={`min-h-screen ${bgApp} ${textApp} font-sans pb-10 transition-colors duration-300`}>
+      <div className={`sticky top-0 z-20 ${bgApp} border-b ${borderApp} pt-safe`}>
+        <div className="max-w-md mx-auto">
+          <div className="px-5 py-4 flex items-center justify-between">
+            <h1 className="text-xl font-black tracking-tighter italic flex items-center gap-2">
+              🎌 JAPAN 2026
+            </h1>
+            <div className="flex gap-2 items-center">
+              <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}>
+                {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
+              </button>
+              <span className={`text-[9px] font-bold px-3 py-1 rounded-full animate-pulse border ${isDarkMode ? 'bg-green-900/30 text-green-400 border-green-800' : 'bg-green-50 text-green-600 border-green-100'}`}>☁️ Sincronizado</span>
             </div>
           </div>
-        </div>
-
-        <main className="max-w-md mx-auto p-4 mt-2">
           
-          {/* PESTAÑA INFO */}
-          {activeTab === 'resumen' && (
-            <div className="space-y-4 animate-in fade-in duration-300">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-slate-50 dark:bg-slate-900 rounded-[28px] p-5">
-                  <Moon className="w-5 h-5 text-indigo-500 mb-2" />
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Noches</p>
-                  <p className="text-xl font-black">13 (JP)</p>
-                </div>
-                <div className="bg-slate-50 dark:bg-slate-900 rounded-[28px] p-5">
-                  <Zap className="w-5 h-5 text-amber-500 mb-2" />
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Bases</p>
-                  <p className="text-xl font-black">TKY/OSK</p>
-                </div>
-              </div>
+          <div className="flex px-3 pb-2 justify-between">
+            {[ { id: 'resumen', icon: Home, label: 'Info' }, { id: 'itinerario', icon: Map, label: 'Ruta' }, { id: 'mapa', icon: MapPin, label: 'Mapa' }, { id: 'reservas', icon: CheckSquare, label: 'Check' } ].map((item) => (
+              <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center justify-center gap-1.5 py-3 w-20 rounded-[20px] transition-all duration-300 ${activeTab === item.id ? (isDarkMode ? 'bg-white text-slate-900 shadow-lg' : 'bg-slate-900 text-white shadow-lg') : (isDarkMode ? 'text-slate-500 hover:bg-slate-900' : 'text-slate-400 hover:bg-slate-50')}`}>
+                <item.icon className="w-5 h-5" />
+                <span className="text-[8px] font-black uppercase tracking-widest">{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
-              <div className="bg-rose-50 dark:bg-rose-900/20 rounded-[28px] p-6 border border-rose-100 dark:border-rose-900/30">
-                 <h3 className="font-black text-base mb-4 text-rose-900 dark:text-rose-300 flex items-center gap-2"><Lightbulb className="w-5 h-5" /> Tips de Supervivencia</h3>
-                 <ul className="text-xs text-rose-800 dark:text-rose-200/80 space-y-3 font-medium">
-                   <li>• <strong>Maletas (Yamato Takkyubin):</strong> Viajar ligeros en Shinkansen. Enviar maletas grandes desde el hotel de Tokio al de Osaka un día antes (aprox ¥2,500 / ~$65,000 COP).</li>
-                   <li>• <strong>Cultura de Basura y Comida:</strong> No está prohibido comer en la calle, pero es mal visto caminar y comer a la vez; mejor hacerlo a un lado del puesto. Hay muy pocos basureros públicos, llevar bolsita en la mochila.</li>
-                   <li>• <strong>Compras Tax-Free:</strong> Aplica en compras desde ¥5,000 (~$130,000 COP) sin impuestos. Llevar pasaporte físico siempre en la mochila.</li>
-                 </ul>
+      <main className="max-w-md mx-auto p-4 mt-2">
+        
+        {/* PESTAÑA INFO */}
+        {activeTab === 'resumen' && (
+          <div className="space-y-4 animate-in fade-in duration-300">
+            <div className="grid grid-cols-2 gap-4">
+              <div className={`${bgCard} rounded-[28px] p-5`}>
+                <Moon className="w-5 h-5 text-indigo-500 mb-2" />
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Noches</p>
+                <p className="text-xl font-black">13 (JP)</p>
               </div>
-
-              <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-[28px] p-6 border border-emerald-100 dark:border-emerald-900/30">
-                 <h3 className="font-black text-base mb-4 text-emerald-900 dark:text-emerald-300 flex items-center gap-2"><ShoppingBag className="w-5 h-5" /> Tiendas Económicas & Skincare</h3>
-                 <ul className="text-xs text-emerald-800 dark:text-emerald-200/80 space-y-3 font-medium">
-                   <li>• <strong>Matsumoto Kiyoshi:</strong> Farmacia gigante, ideal para skincare, cosméticos japoneses y dulces a precios insuperables.</li>
-                   <li>• <strong>Las Tiendas de 100 Yenes (~$2,600 COP):</strong> <em>Daiso</em>, <em>Seria</em>, <em>Can*Do</em> y <em>Watts</em>. Excelentes para souvenirs, papelería y chucherías bellísimas.</li>
-                   <li>• <strong>Lawson Store 100:</strong> Como un mini-súper, pero casi toda la comida y snacks valen 100 yenes. Salva vidas.</li>
-                   <li>• <strong>GU y Uniqlo:</strong> Ropa de calidad a precios bajísimos (GU es la hermana menor y más barata de Uniqlo).</li>
-                   <li>• <strong>Natural Kitchen:</strong> Cositas de hogar y cocina preciosas estilo japonés, súper económicas.</li>
-                 </ul>
+              <div className={`${bgCard} rounded-[28px] p-5`}>
+                <Zap className="w-5 h-5 text-amber-500 mb-2" />
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Bases</p>
+                <p className="text-xl font-black">TKY/OSK</p>
               </div>
-
-              <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-[28px] p-6 border border-indigo-100 dark:border-indigo-900/30">
-                 <h3 className="font-black text-base mb-3 text-indigo-900 dark:text-indigo-300 flex items-center gap-2"><BookOpen className="w-5 h-5" /> Goshuincho Tip</h3>
-                 <p className="text-xs text-indigo-800 dark:text-indigo-200/80 leading-relaxed font-medium">Comprar el libro de sellos (Goshuincho) el primer día en Senso-ji. En cada templo, los monjes pintarán una caligrafía única por ¥300-¥500 (~$8,000 - $13,000 COP). ⛩️</p>
-              </div>
-
-              {/* BOTÓN FORZAR NUBE SÚPER SUTIL */}
-              <div className="pt-8 flex justify-end">
-                <button 
-                  onClick={forceUpdateCloud} 
-                  className="text-slate-300 dark:text-slate-700 hover:text-slate-400 dark:hover:text-slate-500 transition-colors p-2" 
-                  title="Forzar actualización de nube"
-                >
-                  <CloudCog className="w-4 h-4" />
-                </button>
-              </div>
-
             </div>
-          )}
 
-          {/* RUTA */}
-          {activeTab === 'itinerario' && (
-            <div className="space-y-4 pb-10">
-              {itinerary.map((day) => {
-                const theme = themeStyles[day.theme];
-                const isExpanded = expandedDays.includes(day.id);
-                
-                return (
-                  <div key={day.id} className="transition-all duration-300">
-                    <button onClick={() => setExpandedDays(prev => isExpanded ? prev.filter(i => i !== day.id) : [...prev, day.id])} className={`w-full flex items-center justify-between p-4 rounded-[24px] transition-all duration-300 ${isExpanded ? 'bg-slate-50 dark:bg-slate-900 mb-2' : theme.bg}`}>
-                      <div className="flex items-center gap-4 text-left">
-                        <div className={`px-4 py-2 rounded-[16px] ${theme.pillBg} ${theme.text} text-[11px] font-black tracking-tight`}>{day.date}</div>
-                        <span className={`font-black text-[13px] ${theme.text} uppercase tracking-tighter`}>{day.region}</span>
+            <div className={`rounded-[28px] p-6 border ${isDarkMode ? 'bg-rose-900/20 border-rose-900/30' : 'bg-rose-50 border-rose-100'}`}>
+               <h3 className={`font-black text-base mb-4 flex items-center gap-2 ${isDarkMode ? 'text-rose-300' : 'text-rose-900'}`}><Lightbulb className="w-5 h-5" /> Tips de Supervivencia</h3>
+               <ul className={`text-xs space-y-3 font-medium ${isDarkMode ? 'text-rose-200/80' : 'text-rose-800'}`}>
+                 <li>• <strong>Maletas (Yamato Takkyubin):</strong> Viajar ligeros en Shinkansen. Enviar maletas grandes desde el hotel de Tokio al de Osaka un día antes (aprox ¥2,500 / ~$65,000 COP).</li>
+                 <li>• <strong>Cultura de Basura y Comida:</strong> No está prohibido comer en la calle, pero es mal visto caminar y comer a la vez; mejor hacerlo a un lado del puesto. Hay muy pocos basureros públicos, llevar bolsita en la mochila.</li>
+                 <li>• <strong>Compras Tax-Free:</strong> Aplica en compras desde ¥5,000 (~$130,000 COP) sin impuestos. Llevar pasaporte físico siempre en la mochila.</li>
+               </ul>
+            </div>
+
+            <div className={`rounded-[28px] p-6 border ${isDarkMode ? 'bg-emerald-900/20 border-emerald-900/30' : 'bg-emerald-50 border-emerald-100'}`}>
+               <h3 className={`font-black text-base mb-4 flex items-center gap-2 ${isDarkMode ? 'text-emerald-300' : 'text-emerald-900'}`}><ShoppingBag className="w-5 h-5" /> Tiendas Económicas & Skincare</h3>
+               <ul className={`text-xs space-y-3 font-medium ${isDarkMode ? 'text-emerald-200/80' : 'text-emerald-800'}`}>
+                 <li>• <strong>Matsumoto Kiyoshi:</strong> Farmacia gigante, ideal para skincare, cosméticos japoneses y dulces a precios insuperables.</li>
+                 <li>• <strong>Las Tiendas de 100 Yenes (~$2,600 COP):</strong> <em>Daiso</em>, <em>Seria</em>, <em>Can*Do</em> y <em>Watts</em>. Excelentes para souvenirs, papelería y chucherías bellísimas.</li>
+                 <li>• <strong>Lawson Store 100:</strong> Como un mini-súper, pero casi toda la comida y snacks valen 100 yenes. Salva vidas.</li>
+                 <li>• <strong>GU y Uniqlo:</strong> Ropa de calidad a precios bajísimos (GU es la hermana menor y más barata de Uniqlo).</li>
+                 <li>• <strong>Natural Kitchen:</strong> Cositas de hogar y cocina preciosas estilo japonés, súper económicas.</li>
+               </ul>
+            </div>
+
+            <div className={`rounded-[28px] p-6 border ${isDarkMode ? 'bg-indigo-900/20 border-indigo-900/30' : 'bg-indigo-50 border-indigo-100'}`}>
+               <h3 className={`font-black text-base mb-3 flex items-center gap-2 ${isDarkMode ? 'text-indigo-300' : 'text-indigo-900'}`}><BookOpen className="w-5 h-5" /> Goshuincho Tip</h3>
+               <p className={`text-xs leading-relaxed font-medium ${isDarkMode ? 'text-indigo-200/80' : 'text-indigo-800'}`}>Comprar el libro de sellos (Goshuincho) el primer día en Senso-ji. En cada templo, los monjes pintarán una caligrafía única por ¥300-¥500 (~$8,000 - $13,000 COP). ⛩️</p>
+            </div>
+
+            {/* BOTÓN FORZAR NUBE SÚPER SUTIL */}
+            <div className="pt-8 flex justify-end">
+              <button 
+                onClick={forceUpdateCloud} 
+                className={`p-2 transition-colors ${isDarkMode ? 'text-slate-800 hover:text-slate-600' : 'text-slate-200 hover:text-slate-300'}`}
+                title="Forzar nube"
+              >
+                <CloudCog className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* RUTA */}
+        {activeTab === 'itinerario' && (
+          <div className="space-y-4 pb-10">
+            {itinerary.map((day) => {
+              const theme = getTheme(day.theme);
+              const isExpanded = expandedDays.includes(day.id);
+              
+              return (
+                <div key={day.id} className="transition-all duration-300">
+                  <button onClick={() => setExpandedDays(prev => isExpanded ? prev.filter(i => i !== day.id) : [...prev, day.id])} className={`w-full flex items-center justify-between p-4 rounded-[24px] transition-all duration-300 ${isExpanded ? `${bgCard} mb-2` : theme.bg}`}>
+                    <div className="flex items-center gap-4 text-left">
+                      <div className={`px-4 py-2 rounded-[16px] ${theme.pillBg} ${theme.text} text-[11px] font-black tracking-tight`}>{day.date}</div>
+                      <span className={`font-black text-[13px] ${theme.text} uppercase tracking-tighter`}>{day.region}</span>
+                    </div>
+                    {isExpanded ? <ChevronUp className={`w-5 h-5 ${theme.text} opacity-50`} /> : <ChevronDown className={`w-5 h-5 ${theme.text} opacity-50`} />}
+                  </button>
+                  
+                  {isExpanded && (
+                    <div className="px-4 pb-6 pt-2 animate-in slide-in-from-top-2">
+                      <div className="mb-6">
+                         <p className="text-[14px] font-black italic">"{day.mainActivity}"</p>
                       </div>
-                      {isExpanded ? <ChevronUp className={`w-5 h-5 ${theme.text} opacity-50`} /> : <ChevronDown className={`w-5 h-5 ${theme.text} opacity-50`} />}
-                    </button>
-                    
-                    {isExpanded && (
-                      <div className="px-4 pb-6 pt-2 animate-in slide-in-from-top-2">
-                        <div className="mb-6">
-                           <p className="text-[14px] font-black italic">"{day.mainActivity}"</p>
-                        </div>
-                        
-                        <div className="space-y-0">
-                          {day.activities.map((act) => (
-                            <div key={act.id} className="relative pl-6 border-l-2 border-slate-100 dark:border-slate-800 ml-2 pb-6 last:pb-0 text-left">
-                              <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full ${theme.dot} border-[3px] border-white dark:border-slate-950 shadow-sm`} />
-                              
-                              <div className="mb-1">
-                                <span className={`text-[11px] font-black ${theme.text} uppercase tracking-tight block mb-0.5`}>{act.time}</span>
-                                <span className="font-black text-[13px] leading-tight uppercase">{act.name}</span>
-                              </div>
-                              
-                              {act.hours && <p className="text-[10px] font-bold text-slate-400 mt-1 tracking-tight">⏱️ {act.hours}</p>}
-                              <p className="text-[12px] text-slate-600 dark:text-slate-400 font-medium leading-relaxed mt-2">{act.notes}</p>
-                              
-                              {act.link && (
-                                <a 
-                                  href={act.link} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
-                                  className={`inline-flex items-center gap-1 mt-3 text-[11px] font-black ${theme.text} ${theme.pillBg} px-4 py-2 rounded-xl hover:opacity-80 transition-all shadow-sm active:scale-95`}
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  {act.linkLabel} 🔗
-                                </a>
-                              )}
+                      
+                      <div className="space-y-0">
+                        {day.activities.map((act) => (
+                          <div key={act.id} className={`relative pl-6 border-l-2 ml-2 pb-6 last:pb-0 text-left ${borderApp}`}>
+                            <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full ${theme.dot} border-[3px] shadow-sm ${isDarkMode ? 'border-slate-950' : 'border-white'}`} />
+                            
+                            <div className="mb-1">
+                              <span className={`text-[11px] font-black ${theme.text} uppercase tracking-tight block mb-0.5`}>{act.time}</span>
+                              <span className="font-black text-[13px] leading-tight uppercase">{act.name}</span>
                             </div>
-                          ))}
-                        </div>
+                            
+                            {act.hours && <p className="text-[10px] font-bold text-slate-400 mt-1 tracking-tight">⏱️ {act.hours}</p>}
+                            <p className={`text-[12px] font-medium leading-relaxed mt-2 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>{act.notes}</p>
+                            
+                            {act.link && (
+                              <a 
+                                href={act.link} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className={`inline-flex items-center gap-1 mt-3 text-[11px] font-black ${theme.text} ${theme.pillBg} px-4 py-2 rounded-xl hover:opacity-80 transition-all shadow-sm active:scale-95`}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {act.linkLabel} 🔗
+                              </a>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                    )}
-                  </div>
-                );
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* MAPA INTERACTIVO */}
+        {activeTab === 'mapa' && (
+          <div className="space-y-4 animate-in fade-in duration-300 flex flex-col h-[70vh] min-h-[500px] justify-start">
+            <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+              {itinerary.filter(day => !day.id.includes('v') && day.id !== 'd15').map((day) => {
+                const theme = getTheme(day.theme);
+                return (
+                  <button 
+                    key={day.id} 
+                    onClick={() => setSelectedMapDay(day.id)}
+                    className={`flex-shrink-0 px-5 py-3 rounded-2xl text-[12px] font-black uppercase tracking-tight transition-all active:scale-95 ${selectedMapDay === day.id ? (isDarkMode ? 'bg-white text-slate-900 shadow-md' : 'bg-slate-900 text-white shadow-md') : `${theme.bg} ${theme.text} hover:opacity-80`}`}
+                  >
+                    📍 {day.date}
+                  </button>
+                )
               })}
             </div>
-          )}
-
-          {/* MAPA INTERACTIVO */}
-          {activeTab === 'mapa' && (
-            <div className="space-y-4 animate-in fade-in duration-300 flex flex-col h-[70vh] min-h-[500px] justify-start">
-              <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
-                {itinerary.filter(day => !day.id.includes('v') && day.id !== 'd15').map((day) => {
-                  const theme = themeStyles[day.theme];
-                  return (
-                    <button 
-                      key={day.id} 
-                      onClick={() => setSelectedMapDay(day.id)}
-                      className={`flex-shrink-0 px-5 py-3 rounded-2xl text-[12px] font-black uppercase tracking-tight transition-all active:scale-95 ${selectedMapDay === day.id ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-md' : `${theme.bg} ${theme.text} hover:opacity-80`}`}
-                    >
-                      📍 {day.date}
-                    </button>
-                  )
-                })}
-              </div>
-              
-              <div className="flex-1 rounded-[32px] overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm bg-slate-100 dark:bg-slate-900 relative">
-                <iframe 
-                  title="Mapa de Rutas Diarias"
-                  src={`https://maps.google.com/maps?${itinerary.find(d => d.id === selectedMapDay)?.routeQuery}&output=embed`}
-                  className="absolute inset-0 w-full h-full border-0"
-                  allowFullScreen=""
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                ></iframe>
-              </div>
-              
-              <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-[20px] text-center border border-slate-100 dark:border-slate-800">
-                <p className="text-[12px] font-black uppercase italic mb-1">
-                  {itinerary.find(d => d.id === selectedMapDay)?.mainActivity}
-                </p>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest italic">
-                  Desliza los botones arriba para cambiar de día
-                </p>
-              </div>
+            
+            <div className={`flex-1 rounded-[32px] overflow-hidden border shadow-sm relative ${borderCard}`}>
+              <iframe 
+                title="Mapa de Rutas Diarias"
+                src={`https://maps.google.com/maps?${itinerary.find(d => d.id === selectedMapDay)?.routeQuery}&output=embed`}
+                className="absolute inset-0 w-full h-full border-0"
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
             </div>
-          )}
-
-          {/* CHECK */}
-          {activeTab === 'reservas' && (
-            <div className="space-y-8 pb-24 animate-in fade-in duration-300">
-              <div className="bg-slate-50 dark:bg-slate-900 rounded-[32px] p-6">
-                 <h3 className="font-black text-sm uppercase mb-4 flex items-center gap-2"><Building className="w-5 h-5 text-indigo-500" /> Hospedajes</h3>
-                 <div className="space-y-2">
-                   {checklist.filter(i => i.category === 'hospedaje').map(item => (
-                     <label key={item.id} className="flex items-center gap-4 p-4 bg-white dark:bg-slate-950 rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
-                       <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-indigo-600 checked:bg-indigo-600 dark:border-slate-700 transition-all" />
-                       <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 dark:text-slate-600 line-through' : ''}`}>{item.text}</span>
-                     </label>
-                   ))}
-                 </div>
-              </div>
-
-              <div className="bg-slate-50 dark:bg-slate-900 rounded-[32px] p-6">
-                 <h3 className="font-black text-sm uppercase mb-4 flex items-center gap-2"><Train className="w-5 h-5 text-rose-500" /> Transportes y Trámites</h3>
-                 <div className="space-y-2">
-                   {checklist.filter(i => i.category === 'transporte').map(item => (
-                     <label key={item.id} className="flex items-center gap-4 p-4 bg-white dark:bg-slate-950 rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
-                       <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-rose-600 checked:bg-rose-600 dark:border-slate-700 transition-all" />
-                       <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 dark:text-slate-600 line-through' : ''}`}>{item.text}</span>
-                     </label>
-                   ))}
-                 </div>
-                 <div className="mt-4 p-4 bg-rose-100/50 dark:bg-rose-900/20 rounded-[20px] flex gap-3 text-left border border-rose-200 dark:border-rose-900/30">
-                    <AlertTriangle className="w-5 h-5 text-rose-500 flex-shrink-0" />
-                    <p className="text-[11px] font-medium text-rose-800 dark:text-rose-200/80 leading-relaxed"><strong>¡Atención!</strong> Tickets de Shinkansen y Highway Bus al Fuji se habilitan para comprar exactamente <strong>30 días antes</strong>.</p>
-                 </div>
-              </div>
-
-              <div className="bg-slate-50 dark:bg-slate-900 rounded-[32px] p-6">
-                 <h3 className="font-black text-sm uppercase mb-4 flex items-center gap-2"><Ticket className="w-5 h-5 text-emerald-500" /> Atracciones</h3>
-                 <div className="space-y-2">
-                   {checklist.filter(i => i.category === 'atraccion').map(item => (
-                     <label key={item.id} className="flex items-center gap-4 p-4 bg-white dark:bg-slate-950 rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm">
-                       <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg border-2 border-slate-300 text-emerald-600 checked:bg-emerald-600 dark:border-slate-700 transition-all" />
-                       <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? 'text-slate-400 dark:text-slate-600 line-through' : ''}`}>{item.text}</span>
-                     </label>
-                   ))}
-                 </div>
-                 <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-[20px] flex gap-3 text-left border border-amber-200 dark:border-amber-900/30">
-                    <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
-                    <p className="text-[11px] font-medium text-amber-800 dark:text-amber-200/80 leading-relaxed"><strong>Advertencia Extrema:</strong> Las reservas para Shibuya Sky y Pokémon Café vuelan. Poner alarma <strong>4 semanas antes a las 6:00 PM (hora JP)</strong>.</p>
-                 </div>
-              </div>
+            
+            <div className={`${bgCard} p-4 rounded-[20px] text-center border ${borderCard}`}>
+              <p className="text-[12px] font-black uppercase italic mb-1">
+                {itinerary.find(d => d.id === selectedMapDay)?.mainActivity}
+              </p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest italic">
+                Desliza los botones arriba para cambiar de día
+              </p>
             </div>
-          )}
-        </main>
-      </div>
-      
-      <style dangerouslySetContent={{__html: `
-        .touch-pan-y { touch-action: pan-y pinch-zoom; }
-      `}} />
+          </div>
+        )}
+
+        {/* CHECK */}
+        {activeTab === 'reservas' && (
+          <div className="space-y-8 pb-24 animate-in fade-in duration-300">
+            <div className={`${bgCard} rounded-[32px] p-6`}>
+               <h3 className="font-black text-sm uppercase mb-4 flex items-center gap-2"><Building className="w-5 h-5 text-indigo-500" /> Hospedajes</h3>
+               <div className="space-y-2">
+                 {checklist.filter(i => i.category === 'hospedaje').map(item => (
+                   <label key={item.id} className={`flex items-center gap-4 p-4 rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm ${bgApp}`}>
+                     <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className={`w-6 h-6 rounded-lg border-2 transition-all ${isDarkMode ? 'border-slate-700 text-indigo-400 checked:bg-indigo-400' : 'border-slate-300 text-indigo-600 checked:bg-indigo-600'}`} />
+                     <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? (isDarkMode ? 'text-slate-600 line-through' : 'text-slate-400 line-through') : ''}`}>{item.text}</span>
+                   </label>
+                 ))}
+               </div>
+            </div>
+
+            <div className={`${bgCard} rounded-[32px] p-6`}>
+               <h3 className="font-black text-sm uppercase mb-4 flex items-center gap-2"><Train className="w-5 h-5 text-rose-500" /> Transportes y Trámites</h3>
+               <div className="space-y-2">
+                 {checklist.filter(i => i.category === 'transporte').map(item => (
+                   <label key={item.id} className={`flex items-center gap-4 p-4 rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm ${bgApp}`}>
+                     <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className={`w-6 h-6 rounded-lg border-2 transition-all ${isDarkMode ? 'border-slate-700 text-rose-400 checked:bg-rose-400' : 'border-slate-300 text-rose-600 checked:bg-rose-600'}`} />
+                     <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? (isDarkMode ? 'text-slate-600 line-through' : 'text-slate-400 line-through') : ''}`}>{item.text}</span>
+                   </label>
+                 ))}
+               </div>
+               <div className={`mt-4 p-4 rounded-[20px] flex gap-3 text-left border ${isDarkMode ? 'bg-rose-900/20 border-rose-900/30' : 'bg-rose-100/50 border-rose-200'}`}>
+                  <AlertTriangle className="w-5 h-5 text-rose-500 flex-shrink-0" />
+                  <p className={`text-[11px] font-medium leading-relaxed ${isDarkMode ? 'text-rose-200/80' : 'text-rose-800'}`}><strong>¡Atención!</strong> Tickets de Shinkansen y Highway Bus al Fuji se habilitan para comprar exactamente <strong>30 días antes</strong>.</p>
+               </div>
+            </div>
+
+            <div className={`${bgCard} rounded-[32px] p-6`}>
+               <h3 className="font-black text-sm uppercase mb-4 flex items-center gap-2"><Ticket className="w-5 h-5 text-emerald-500" /> Atracciones</h3>
+               <div className="space-y-2">
+                 {checklist.filter(i => i.category === 'atraccion').map(item => (
+                   <label key={item.id} className={`flex items-center gap-4 p-4 rounded-[20px] cursor-pointer active:scale-95 transition-all shadow-sm ${bgApp}`}>
+                     <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className={`w-6 h-6 rounded-lg border-2 transition-all ${isDarkMode ? 'border-slate-700 text-emerald-400 checked:bg-emerald-400' : 'border-slate-300 text-emerald-600 checked:bg-emerald-600'}`} />
+                     <span className={`text-[12px] font-black italic tracking-tight ${item.completed ? (isDarkMode ? 'text-slate-600 line-through' : 'text-slate-400 line-through') : ''}`}>{item.text}</span>
+                   </label>
+                 ))}
+               </div>
+               <div className={`mt-4 p-4 rounded-[20px] flex gap-3 text-left border ${isDarkMode ? 'bg-amber-900/20 border-amber-900/30' : 'bg-amber-50 border-amber-200'}`}>
+                  <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                  <p className={`text-[11px] font-medium leading-relaxed ${isDarkMode ? 'text-amber-200/80' : 'text-amber-800'}`}><strong>Advertencia Extrema:</strong> Las reservas para Shibuya Sky y Pokémon Café vuelan. Poner alarma <strong>4 semanas antes a las 6:00 PM (hora JP)</strong>.</p>
+               </div>
+            </div>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
