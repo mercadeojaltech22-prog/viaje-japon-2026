@@ -46,7 +46,7 @@ const initialItinerary = [
     activities: [
       { id: 'a5', time: '09:00', name: 'Shibuya y Hachiko', notes: 'Cruce peatonal más famoso del mundo y foto con el perrito.' },
       { id: 'a5b', time: '10:30', name: 'Shibuya Sky', hours: '10:00 - 22:30', notes: '🎟️ RESERVA OBLIGATORIA (Hacerla 4 semanas antes). Vista panorámica increíble.' },
-      { id: 'a6', time: '14:00', name: 'Odaiba (Gundam Base)', notes: '🚆 Tomar el tren Yurikamome. Ver el Gundam Unicorn gigante y el centro DiverCity.' },
+      { id: 'a6', time: '14:00', name: 'Odaiba (Gundam Base)', notes: '🚆 Tomar el tren Yurikamome. Ver el Gundam Unicorn gigante a escala real y el centro comercial DiverCity.' },
       { id: 'a7', time: '18:30', name: 'Shinkansen a Osaka', notes: '🚆 Salida Estación Tokio. Comprar Eki-ben (lunch box japonesas) para cenar en el tren bala.' }
     ] 
   },
