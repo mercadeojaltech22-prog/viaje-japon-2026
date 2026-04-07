@@ -30,67 +30,66 @@ const initialItinerary = [
     ] 
   },
   { 
-    id: 'd1', date: '15-may', region: 'TOKIO (UENO/ASAKUSA)', theme: 'blue', mainActivity: 'Asakusa + Skytree + Compras', 
-    routeQuery: 'saddr=Narita+International+Airport&daddr=Senso-ji+to:Asakusa+Hanayashiki+to:Tokyo+Skytree+to:Don+Quijote+Asakusa',
+    id: 'd1', date: '15-may', region: 'TOKIO', theme: 'blue', mainActivity: 'Ueno + Asakusa + Skytree', 
+    routeQuery: 'saddr=Narita+International+Airport&daddr=Senso-ji+to:Tokyo+Skytree+to:Don+Quijote+Asakusa',
     activities: [
-      { id: 'a1', time: '06:30', name: 'Aterrizaje Narita (NRT)', notes: 'Pasar migración. Recoger Suica/Pasmo. 🚆 TRASLADO: Tomar Tren Keisei Skyliner (Aeropuerto ↔ Tokio) hasta Ueno.' },
-      { id: 'a2', time: '13:00', name: 'Templo Senso-ji', notes: '⛩️ Recorrer Nakamise. 🛍️ Comprar el "Goshuincho" (Libro de sellos). Ver el Centro Turístico Asakusa (Mirador piso 8 gratis).' },
-      { id: 'a3', time: '15:00', name: 'Asakusa Hanayashiki', notes: '🎢 Parque vintage japonés. Luego ver el edificio Asahi y cruzar hacia el Skytree.' },
-      { id: 'a4', time: '17:30', name: 'Tokyo Skytree', hours: '10:00 - 21:00', notes: '🎟️ Subir para ver el atardecer sobre Tokio. (Reserva previa).' },
-      { id: 'a5', time: '19:30', name: 'Don Quijote + Hobby Off', notes: '🛍️ Donki para snacks y Hobby Off para figuras de anime baratas.' }
+      { id: 'a1', time: '06:30', name: 'Aterrizaje Narita (NRT)', notes: 'Pasar migración. Recoger Suica/Pasmo y activar eSIM. 🚆 TRASLADO: Tomar Tren Keisei Skyliner (Aeropuerto ↔ Tokio) hasta Ueno.', link: 'https://www.vjw.digital.go.jp/', linkLabel: '🛂 Visit Japan Web' },
+      { id: 'a3', time: '13:00', name: 'Templo Senso-ji', hours: '6:00 - 17:00', notes: '⛩️ Recorrer la calle Nakamise. 🛍️ Comprar el "Goshuincho" (Libro de sellos). Ver el Centro Turístico Asakusa (Mirador piso 8 gratis).' },
+      { id: 'a4', time: '17:30', name: 'Tokyo Skytree', hours: '10:00 - 21:00', notes: '🎟️ Reserva obligatoria. Subir para el atardecer sobre la ciudad.' },
+      { id: 'a4b', time: '19:30', name: 'Don Quijote + Hobby Off', notes: '🛍️ Donki abre 24h para snacks. Hobby Off es ideal para buscar figuras de anime baratas.' }
     ] 
   },
   { 
     id: 'd2', date: '16-may', region: 'TOKIO → OSAKA', theme: 'blue', mainActivity: 'Shibuya + Odaiba + Shinkansen', 
     routeQuery: 'saddr=Shibuya+Crossing&daddr=Shibuya+Sky+to:Odaiba+Gundam+Base+to:Tokyo+Station+to:Shin-Osaka+Station',
     activities: [
-      { id: 'a5', time: '09:00', name: 'Shibuya y Hachiko', notes: 'Cruce peatonal famoso y foto con el perrito.' },
-      { id: 'a5b', time: '10:30', name: 'Shibuya Sky', notes: '🎟️ RESERVA OBLIGATORIA (4 semanas antes). Vista panorámica increíble.' },
+      { id: 'a5', time: '09:00', name: 'Shibuya y Hachiko', notes: 'Cruce peatonal más famoso y foto con la estatua.' },
+      { id: 'a5b', time: '10:30', name: 'Shibuya Sky', hours: '10:00 - 22:30', notes: '🎟️ RESERVA OBLIGATORIA (Hacerla 4 semanas antes).' },
       { id: 'a6', time: '14:00', name: 'Odaiba (Gundam Base)', notes: '🚆 Tren Yurikamome. Ver el Gundam gigante y centro comercial DiverCity.' },
       { id: 'a7', time: '18:30', name: 'Shinkansen a Osaka', notes: '🚆 Salida Estación Tokio. Comprar Eki-ben en la estación para cenar en el tren bala.' }
     ] 
   },
   { 
-    id: 'd3', date: '17-may', region: 'NAGOYA (GHIBLI PARK)', theme: 'rose', mainActivity: 'Parque Ghibli + Noche Osaka', 
+    id: 'd3', date: '17-may', region: 'NAGOYA / OSAKA (PARQUE GHIBLI)', theme: 'rose', mainActivity: 'Ghibli Park + Noche Osaka', 
     routeQuery: 'saddr=Shin-Osaka+Station&daddr=Ghibli+Park,+Aichi+to:Dotonbori,+Osaka',
     activities: [
-      { id: 'a11', time: '10:00', name: 'Parque Ghibli (Nagoya)', hours: '10:00 - 17:00', notes: '🎟️ CONFIRMADO. 🛍️ La tienda "Adventurous Spirit" tiene cosas únicas.', link: 'https://quickticket.moala.fun/books?id=14afc57f-d0b6-4a66-a902-7bb79d1e4e7f', linkLabel: '🎟️ Abrir Ticket QR' },
-      { id: 'a11b', time: '17:30', name: 'Regreso a Osaka', notes: '🚆 LOGÍSTICA: Tren Linimo -> Metro Higashiyama -> Shinkansen desde Nagoya a Shin-Osaka (aprox 1.5h).' },
-      { id: 'a12', time: '19:30', name: 'Dotonbori (Osaka)', notes: '🐙 Noche de neones, Takoyaki y el famoso cartel de Glico Man.' }
+      { id: 'a11', time: '10:00', name: 'Parque Ghibli (Nagoya)', hours: '10:00 - 17:00', notes: '🎟️ CONFIRMADO. 🛍️ La tienda "Adventurous Spirit" tiene mercancía exclusiva.', link: 'https://quickticket.moala.fun/books?id=14afc57f-d0b6-4a66-a902-7bb79d1e4e7f', linkLabel: '🎟️ Entrada QR Ghibli' },
+      { id: 'a11b', time: '17:30', name: 'Retorno a Osaka', notes: '🚆 REGRESO: Tren Linimo -> Metro Higashiyama -> Shinkansen de Nagoya a Shin-Osaka (aprox 1h).' },
+      { id: 'a12', time: '19:30', name: 'Dotonbori (Osaka)', notes: '🐙 Noche fuerte de comida en Osaka. Foto con el Glico Man.' }
     ] 
   },
   { 
     id: 'd4', date: '18-may', region: 'OSAKA (UNIVERSAL STUDIOS)', theme: 'emerald', mainActivity: 'Universal Studios Japan (USJ)', 
     routeQuery: 'saddr=Namba+Station,+Osaka&daddr=Universal+Studios+Japan',
     activities: [
-      { id: 'a13', time: '08:00', name: 'Día en USJ', notes: '🚆 TRASLADO: JR Yumesaki Line desde Nishikujo. 🚆 REGRESO: Misma ruta inversa hacia Namba/Osaka.' }
+      { id: 'a13', time: '08:00', name: 'Día en USJ', notes: '🚆 TRASLADO IDA: JR Yumesaki Line desde Nishikujo. 🚆 REGRESO: Misma ruta inversa hacia Namba/Osaka.' }
     ] 
   },
   { 
-    id: 'd5', date: '19-may', region: 'NARA', theme: 'emerald', mainActivity: 'Templos y Tradición de Nara', 
+    id: 'd5', date: '19-may', region: 'NARA', theme: 'emerald', mainActivity: 'Ciervos y Templos de Nara', 
     routeQuery: 'saddr=Namba+Station,+Osaka&daddr=Todai-ji,+Nara+to:Kasuga+Taisha+to:Naramachi',
     activities: [
-      { id: 'a14', time: '09:30', name: 'Todai-ji + Kasuga Taisha', notes: '🦌 Ciervos y Buda gigante. 🚆 TRASLADO: Tren Kintetsu desde Namba. 🚆 REGRESO: Tren Kintetsu vuelta a Osaka.' },
-      { id: 'a14b', time: '15:00', name: 'Naramachi', notes: '🚶 Distrito antiguo. 🛍️ Souvenirs y destilerías de sake.' }
+      { id: 'a14', time: '09:30', name: 'Templo Todai-ji + Kasuga Taisha', notes: '🦌 Ciervos y el Buda gigante. 🚆 TRASLADO: Tren Kintetsu desde Namba. 🚆 REGRESO: Tren Kintetsu vuelta a Osaka.' },
+      { id: 'a14b', time: '15:00', name: 'Naramachi', notes: '🚶 Distrito antiguo comercial de Nara.' }
     ] 
   },
   { 
-    id: 'd9', date: '23-may', region: 'FUJI → TOKIO', theme: 'rose', mainActivity: 'Fuji Shibazakura + Omoide Yokocho', 
-    routeQuery: 'saddr=Shin-Osaka+Station&daddr=Fuji+Shibazakura+Festival+to:Omoide+Yokocho,+Shinjuku',
+    id: 'd9', date: '23-may', region: 'FUJI → TOKIO', theme: 'rose', mainActivity: 'Shibazakura + Omoide Yokocho', 
+    routeQuery: 'saddr=Shin-Osaka+Station&daddr=Mishima+Station+to:Fuji+Shibazakura+Festival+to:Omoide+Yokocho,+Shinjuku',
     activities: [
       { id: 'a25', time: '06:30', name: 'Salida Osaka → Mishima', notes: '🚆 Shinkansen Kodama muy temprano.' },
-      { id: 'a27', time: '11:00', name: 'Shibazakura Festival', notes: '🌸 Mar de flores rosas frente al Fuji. 🚌 TRASLADO: Bus local desde Mishima.' },
-      { id: 'a28', time: '16:30', name: 'Bus de Larga Distancia (Highway Bus)', notes: '🚌 Regreso directo del Fuji a Shinjuku (Tokio). 🎟️ RESERVA PREVIA OBLIGATORIA.' },
-      { id: 'a28b', time: '19:30', name: 'Omoide Yokocho (Shinjuku)', notes: '🍢 Humo, yakitoris y cervezas en el callejón retro.' }
+      { id: 'a27', time: '11:00', name: 'Shibazakura Festival', notes: '🌸 Ver el Fuji con flores rosas. 🚌 TRASLADO: Bus local desde Estación Mishima.' },
+      { id: 'a28', time: '16:00', name: 'Bus de Larga Distancia (Highway Bus)', notes: '🚌 Regreso directo del Fuji a Shinjuku (Tokio). 🎟️ RESERVA PREVIA OBLIGATORIA.' },
+      { id: 'a28b', time: '19:30', name: 'Omoide Yokocho (Shinjuku)', notes: '🍢 Cena en el famoso callejón de los yakitoris.' }
     ] 
   },
   { 
-    id: 'd11', date: '25-may', region: 'TOKIO', theme: 'blue', mainActivity: 'Shimokitazawa + Nintendo + Despedida', 
+    id: 'd11', date: '25-may', region: 'TOKIO (SHIMOKITAZAWA)', theme: 'blue', mainActivity: 'Barrio Vintage + Nintendo Tokyo + Despedida', 
     routeQuery: 'saddr=Shimokitazawa+Station&daddr=Nintendo+Tokyo+to:Ueno+Station',
     activities: [
-      { id: 'a31', time: '10:00', name: 'Shimokitazawa', notes: '🛍️ Barrio bohemio: ropa vintage y cafés. 🚆 TRASLADO: A solo 5 min de Shibuya en la línea Keio Inokashira.' },
-      { id: 'a31b', time: '13:00', name: 'Nintendo Tokyo (Shibuya PARCO)', notes: '🕹️ Tienda oficial en el piso 6. Aprovechar para compras finales de figuras y regalos.' },
-      { id: 'a32', time: '20:00', name: 'Despedida Mauro y Julián', notes: '✈️ Ellos salen al aeropuerto. El resto del grupo se muda al Hotel Tokio 3 (Ueno).' }
+      { id: 'a31', time: '10:00', name: 'Barrio Shimokitazawa', notes: '🛍️ Barrio bohemio: ropa vintage, cafés y tiendas de discos.' },
+      { id: 'a31b', time: '13:00', name: 'Nintendo Tokyo (Shibuya PARCO)', notes: '🕹️ Tienda oficial (Piso 6). 🚆 TRASLADO: A solo 5 min de Shimokitazawa en la línea Keio Inokashira.' },
+      { id: 'a32', time: '20:00', name: 'Despedida Mauro y Julián', notes: '✈️ Salida de ellos hacia el aeropuerto. El resto se muda al Hotel Tokio 3 (Ueno).' }
     ] 
   }
 ];
@@ -102,14 +101,17 @@ const initialChecklist = [
   { id: 'c_h3', category: 'hospedaje', text: 'Hotel Tokio 2 (Ueno) - 23 al 25 Mayo (2 Noches, 5 Personas)', completed: true },
   { id: 'c_h4', category: 'hospedaje', text: 'Hotel Tokio 3 (Ueno) - 25 al 28 Mayo (3 Noches, 3 Personas)', completed: true },
   
-  { id: 'c_t1', category: 'transporte', text: 'Shinkansen: Tokio → Osaka (30 días antes)', completed: false },
+  { id: 'c_v1', category: 'transporte', text: 'Vuelos Ida (MDE-MEX-NRT)', completed: true },
+  { id: 'c_v2', category: 'transporte', text: 'Vuelos Regreso (NRT-ICN-MEX-MDE)', completed: true },
+  { id: 'c_t1', category: 'transporte', text: 'Shinkansen: Tokio → Osaka (Reservar 30 días antes)', completed: false },
   { id: 'c_t2', category: 'transporte', text: 'Bus de Larga Distancia (Highway Bus): Kawaguchiko → Shinjuku', completed: false },
   { id: 'c_t4', category: 'transporte', text: 'Tren Keisei Skyliner (Aeropuerto Narita ↔ Tokio)', completed: false },
+  { id: 'c_t3', category: 'transporte', text: 'Permiso K-ETA (Corea del Sur)', completed: false },
   
   { id: 'c_a1', category: 'atraccion', text: 'Ghibli Park - OK', completed: true },
   { id: 'c_a2', category: 'atraccion', text: 'Universal Studios - OK', completed: true },
-  { id: 'c_a3', category: 'atraccion', text: 'Shibuya Sky (4 semanas antes)', completed: false },
-  { id: 'c_a4', category: 'atraccion', text: 'Pokémon Café Osaka (31 días antes)', completed: false },
+  { id: 'c_a3', category: 'atraccion', text: 'Shibuya Sky (Reservar 4 semanas antes)', completed: false },
+  { id: 'c_a4', category: 'atraccion', text: 'Pokémon Café Osaka (Reservar 31 días antes)', completed: false },
 ];
 
 export default function App() {
@@ -151,7 +153,7 @@ export default function App() {
   };
 
   const forceUpdateCloud = async () => {
-    if(window.confirm("¿Forzar actualización total?")) {
+    if(window.confirm("¿Forzar actualización total a prueba de bobos?")) {
       const mergedChecklist = initialChecklist.map(initItem => {
         const existingItem = checklist.find(c => c.id === initItem.id);
         return existingItem ? { ...initItem, completed: existingItem.completed } : initItem;
@@ -193,12 +195,12 @@ export default function App() {
         {activeTab === 'resumen' && (
           <div className="space-y-4 animate-in fade-in">
             <div className={`rounded-[28px] p-6 border ${isDarkMode ? 'bg-emerald-900/20 border-emerald-900/30' : 'bg-emerald-50 border-emerald-100'}`}>
-               <h3 className="font-black text-base mb-4 flex items-center gap-2"><ShoppingBag className="w-5 h-5 text-emerald-900 dark:text-emerald-300" /> Guía de Compras</h3>
+               <h3 className="font-black text-base mb-4 flex items-center gap-2"><ShoppingBag className="w-5 h-5" /> Guía de Compras</h3>
                <ul className="text-xs space-y-3 font-medium">
                  <li>• <strong>Loft:</strong> El paraíso del diseño y la papelería.</li>
-                 <li>• <strong>Matsumoto Kiyoshi:</strong> Skincare y cosméticos virales.</li>
-                 <li>• <strong>Okashi No Machioka:</strong> Dulces y snacks al mejor precio.</li>
-                 <li>• <strong>Lawson Store 100 / Daiso:</strong> Todo a 100 yenes. Souvenirs perfectos.</li>
+                 <li>• <strong>Matsumoto Kiyoshi:</strong> Skincare y cosméticos virales baratos.</li>
+                 <li>• <strong>Okashi No Machioka:</strong> Especialistas en dulces y snacks económicos.</li>
+                 <li>• <strong>Daiso / Lawson Store 100:</strong> Todo a 100 yenes. Souvenirs perfectos.</li>
                </ul>
             </div>
             <div className="pt-8 flex justify-end">
@@ -222,14 +224,15 @@ export default function App() {
                     <div className="flex items-center gap-4 text-left">
                       <div className={`px-4 py-2 rounded-[16px] ${theme.pillBg} ${theme.text} text-[11px] font-black`}>{day.date}</div>
                       <div className="flex flex-col">
-                        <span className={`font-black text-[12px] ${theme.text} uppercase`}>{day.region}</span>
-                        {(day.mainActivity.includes("Ghibli") || day.mainActivity.includes("USJ")) && <span className="text-[9px] font-black opacity-60 uppercase">🎡 {day.mainActivity}</span>}
+                        <span className={`font-black text-[13px] ${theme.text} uppercase tracking-tighter`}>{day.region}</span>
+                        {(day.mainActivity.includes("Ghibli") || day.mainActivity.includes("Universal")) && <span className="text-[9px] font-black opacity-60 uppercase">🎡 {day.mainActivity.split(' ').slice(-2).join(' ')}</span>}
                       </div>
                     </div>
                     {isExpanded ? <ChevronUp className="w-5 h-5 opacity-50" /> : <ChevronDown className="w-5 h-5 opacity-50" />}
                   </button>
                   {isExpanded && (
                     <div className="px-4 pb-6 pt-2 animate-in slide-in-from-top-2">
+                      <div className="mb-6"><p className="text-[14px] font-black italic">"{day.mainActivity}"</p></div>
                       <div className="space-y-6">
                         {day.activities.map((act) => (
                           <div key={act.id} className="relative pl-6 border-l-2 ml-2 text-left">
@@ -247,8 +250,47 @@ export default function App() {
             })}
           </div>
         )}
-        {/* MAPA Y RESERVAS IGUAL... */}
+
+        {activeTab === 'mapa' && (
+          <div className="space-y-4 animate-in fade-in flex flex-col h-[70vh]">
+            <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+              {itinerary.filter(day => !day.id.includes('v') && day.id !== 'd15').map((day) => {
+                const theme = getTheme(day.theme);
+                return (
+                  <button key={day.id} onClick={() => setSelectedMapDay(day.id)} className={`flex-shrink-0 px-5 py-3 rounded-2xl text-[12px] font-black uppercase transition-all ${selectedMapDay === day.id ? (isDarkMode ? 'bg-white text-slate-900' : 'bg-slate-900 text-white') : `${theme.bg} ${theme.text}`}`}>
+                    📍 {day.date}
+                  </button>
+                )
+              })}
+            </div>
+            <div className={`flex-1 rounded-[32px] overflow-hidden border ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+              <iframe title="Mapa" src={`https://maps.google.com/maps?${itinerary.find(d => d.id === selectedMapDay)?.routeQuery}&output=embed`} className="w-full h-full border-0" scrolling="no"></iframe>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'reservas' && (
+          <div className="space-y-8 pb-24 animate-in fade-in">
+             {['hospedaje', 'transporte', 'atraccion'].map(cat => (
+               <div key={cat} className={`rounded-[32px] p-6 ${isDarkMode ? 'bg-slate-900' : 'bg-slate-50'}`}>
+                 <h3 className="font-black text-sm uppercase mb-4 flex items-center gap-2">
+                   {cat === 'hospedaje' ? <Building className="w-5 h-5 text-indigo-500" /> : cat === 'transporte' ? <Train className="w-5 h-5 text-rose-500" /> : <Ticket className="w-5 h-5 text-emerald-500" />}
+                   {cat.charAt(0).toUpperCase() + cat.slice(1)}s
+                 </h3>
+                 <div className="space-y-2">
+                   {checklist.filter(i => i.category === cat).map(item => (
+                     <label key={item.id} className={`flex items-center gap-4 p-4 rounded-[20px] cursor-pointer shadow-sm ${isDarkMode ? 'bg-slate-950' : 'bg-white'}`}>
+                       <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-6 h-6 rounded-lg" />
+                       <span className={`text-[12px] font-black italic ${item.completed ? 'text-slate-400 line-through' : ''}`}>{item.text}</span>
+                     </label>
+                   ))}
+                 </div>
+               </div>
+             ))}
+          </div>
+        )}
       </main>
+      <style dangerouslySetContent={{__html: `.touch-pan-y { touch-action: pan-y pinch-zoom; }`}} />
     </div>
   );
 }
