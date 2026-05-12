@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, onSnapshot, setDoc } from "firebase/firestore";
 import { 
-  Home, CalendarDays, Map, CheckSquare, Moon, Sun, Train, Ticket, 
+  Home, CalendarDays, Map, CheckSquare, Moon, Sun, Train, Ticket, Search,
   ChevronDown, ChevronUp, Zap, ShoppingBag, AlertTriangle, BookOpen, Building, Lightbulb, MapPin, CloudCog
 } from 'lucide-react';
 
@@ -139,7 +139,7 @@ const initialItinerary = [
     routeQuery: 'saddr=Nakano+Broadway&daddr=Shimokitazawa,+Tokyo+to:Fuji+Television+Network+to:Ueno+Station',
     activities: [
       { id: 'a31', time: '10:00', name: 'Shopping Libre', notes: '🛍️ Para perderse comprando: Nakano Broadway (Anime barato) o Shimokitazawa (Ropa vintage).' },
-      { id: 'a31b', time: '14:00', name: 'Edificio Fuji TV (Odaiba)', notes: '🏢 Mirador esférico Hachitama (planta 25) y tiendas de merchandising de One Piece y Dragon Ball.' },
+      { id: 'a31b', time: '14:00', name: 'Edificio Fuji TV (Odaiba)', notes: '🏢 Mirador Hachitama (planta 25) con vistas 270° y tiendas de merchandising oficial de anime: One Piece, Dragon Ball, Digimon, Spy x Family y series de temporada.' },
       { id: 'a32', time: '20:00', name: 'Despedida', notes: '✈️ Salida de Mauro y Julián al aeropuerto.' }
     ] 
   },
@@ -165,7 +165,7 @@ const initialItinerary = [
     activities: [
       { id: 'a37', time: '09:00', name: 'Compras última hora en Ueno', notes: '🛍️ Aprovechar la mañana.' },
       { id: 'a38', time: '16:00', name: 'Tren Keisei Skyliner', notes: '🚆 Traslado a Narita (NRT). Vuelo a Seúl.' },
-      { id: 'a39', time: '23:30', name: 'Escala nocturna en Seúl', notes: '🇰🇷 ⏱️ ESCALA NOCTURNA. Dormir en el aeropuerto o salir a la ciudad. ⚠️ RECOMENDACIÓN: En caso de salir del aeropuerto, se debe estar de regreso 3 horas antes del vuelo ICN → MEX debido al tamaño y flujo de seguridad de Incheon.', link: 'https://www.k-eta.go.kr/', linkLabel: '🇰🇷 Registro K-ETA' }
+      { id: 'a39', time: '23:30', name: 'Escala nocturna en Seúl', notes: '🇰🇷 ⏱️ ESCALA NOCTURNA. Dormir en el aeropuerto o salir a la ciudad. ⚠️ IMPORTANTE: Si salen del aeropuerto en Seúl, deben estar de regreso 3 horas antes del vuelo hacia México. Incheon es inmenso y los procesos de seguridad toman tiempo.', link: 'https://www.k-eta.go.kr/', linkLabel: '🇰🇷 Registro K-ETA' }
     ] 
   },
   { 
@@ -215,6 +215,7 @@ export default function App() {
   const [expandedDays, setExpandedDays] = useState([]);
   const [selectedMapDay, setSelectedMapDay] = useState('d1');
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     let meta = document.querySelector('meta[name="viewport"]');
@@ -272,6 +273,12 @@ export default function App() {
   const borderApp = isDarkMode ? 'border-slate-800' : 'border-slate-100';
   const borderCard = isDarkMode ? 'border-slate-800' : 'border-slate-200';
 
+  const filteredItinerary = itinerary.filter(day => 
+    day.mainActivity.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    day.region.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    day.activities.some(act => act.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
   return (
     <div className={`min-h-screen touch-pan-y ${bgApp} ${textApp} font-sans pb-10 transition-colors duration-300`}>
       <div className={`sticky top-0 z-20 ${bgApp} border-b ${borderApp} pt-safe`}>
@@ -308,7 +315,7 @@ export default function App() {
               <div className={`${bgCard} rounded-[28px] p-5`}>
                 <Moon className="w-5 h-5 text-indigo-500 mb-2" />
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Noches</p>
-                <p className="text-xl font-black">13 (JP)</p>
+                <p className="text-xl font-black">14 (JP)</p>
               </div>
               <div className={`${bgCard} rounded-[28px] p-5`}>
                 <Zap className="w-5 h-5 text-amber-500 mb-2" />
@@ -357,9 +364,20 @@ export default function App() {
         {/* RUTA */}
         {activeTab === 'itinerario' && (
           <div className="space-y-4 pb-10">
-            {itinerary.map((day) => {
+            <div className={`relative flex items-center mb-6 p-1 rounded-2xl border ${bgCard} shadow-sm ${borderCard}`}>
+              <Search className="w-4 h-4 ml-3 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="Buscar lugar o actividad..." 
+                className={`w-full bg-transparent p-3 text-xs font-bold focus:outline-none ${isDarkMode ? 'text-white placeholder-slate-500' : 'text-slate-800 placeholder-slate-400'}`} 
+                value={searchTerm} 
+                onChange={(e) => setSearchTerm(e.target.value)} 
+              />
+            </div>
+
+            {filteredItinerary.map((day) => {
               const theme = getTheme(day.theme);
-              const isExpanded = expandedDays.includes(day.id);
+              const isExpanded = expandedDays.includes(day.id) || searchTerm !== '';
               
               return (
                 <div key={day.id} className="transition-all duration-300">
