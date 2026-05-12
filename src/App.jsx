@@ -76,6 +76,23 @@ const initialItinerary = [
       { id: 'a31b', time: '14:00', name: 'Nintendo Tokyo (Shibuya)', notes: '🕹️ Tienda oficial en Shibuya PARCO. A 5 min de Shimokitazawa.' },
       { id: 'a32', time: '20:00', name: 'Despedida Mauro y Julián', notes: '✈️ Salida de ellos al aeropuerto. El resto se muda al Hotel Tokio 3.' }
     ] 
+  },
+  ,
+  { 
+    id: 'd12', date: '26-may', region: 'Tokio', theme: 'blue', mainActivity: 'Sanrio World Ginza + (teamLab)', 
+    routeQuery: 'saddr=Ueno+Station&daddr=Sanrio+World+Ginza+to:teamLab+Planets+Tokyo',
+    activities: [
+      { id: 'a33', time: '10:00', name: 'Sanrio World Ginza', notes: '🎀 La tienda de Sanrio más grande del mundo. Ubicada en Ginza.' },
+      { id: 'a34', time: '14:00', name: 'teamLab Planets (OPCIONAL)', notes: '✨ Museo inmersivo en Toyosu. Es opcional dependiendo del tiempo en Ginza.' }
+    ] 
+  },
+  { 
+    id: 'd13', date: '27-may', region: 'Tokio (Tokorozawa)', theme: 'blue', mainActivity: 'Sakura Town + (teamLab Borderless)', 
+    routeQuery: 'saddr=Ueno+Station&daddr=Higashi-Tokorozawa+Station+to:Azabudai+Hills',
+    activities: [
+      { id: 'a35', time: '10:00', name: 'Higashi-Tokorozawa / Sakura Town', notes: '📚 Visita a Tokorozawa Sakura Town y el Museo Kadokawa Culture.' },
+      { id: 'a36', time: '16:00', name: 'teamLab Borderless (OPCIONAL)', notes: '🏮 Ubicado en Azabudai Hills. Actividad opcional para cerrar el viaje.' }
+    ] 
   }
 ];
 
@@ -245,9 +262,15 @@ export default function App() {
             </div>
             <div className=\"flex-1 rounded-[32px] overflow-hidden border border-slate-200 shadow-sm relative\">
               <iframe title=\"Mapa\" src={`https://maps.google.com/maps?${itinerary.find(d => d.id === selectedMapDay)?.routeQuery}&output=embed`} className=\"absolute inset-0 w-full h-full border-0\" allowFullScreen=\"\" loading=\"lazy\"></iframe>
+              
             </div>
-            <div className=\"bg-white p-4 rounded-[20px] text-center border border-slate-100 shadow-sm\">
-              <p className=\"text-[12px] text-slate-800 font-black uppercase italic\">{itinerary.find(d => d.id === selectedMapDay)?.mainActivity}</p>
+            <div className="bg-white p-4 rounded-[20px] text-center border border-slate-200 shadow-sm mt-2">
+              <p className="text-[12px] text-slate-800 font-black uppercase italic mb-1">
+                {itinerary.find(d => d.id === selectedMapDay)?.mainActivity}
+              </p>
+              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest italic">
+                Desliza los botones arriba para cambiar de día
+              </p>
             </div>
           </div>
         )}
