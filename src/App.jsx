@@ -25,7 +25,7 @@ const initialItinerary = [
     id: 'd_v1', date: '13-may', region: 'Vuelo Ida', theme: 'blue', mainActivity: 'Salida MDE → MEX', 
     routeQuery: 'saddr=Jose+Maria+Cordova+International+Airport&daddr=Mexico+City+International+Airport+to:Narita+International+Airport',
     activities: [
-      { id: 'a_v1', time: '01:00', name: 'Salida MDE → MEX', notes: '✈️ Llegada 04:35 AM. 🇲🇽 LOGÍSTICA: Pre-registro obligatorio en México. Recomendación: Tacos en el Centro Histórico.', link: 'https://www.inm.gob.mx/spublic/portal/inmex.html', linkLabel: '📝 Pre-registro MX' },
+      { id: 'a_v1', time: '01:00', name: 'Salida MDE → MEX', notes: '✈️ Llegada 04:35 AM. 🇲🇽 LOGÍSTICA: Migración obligatoria en México. Recomendación: Tacos en el Centro Histórico.', link: 'https://www.inm.gob.mx/spublic/portal/inmex.html', linkLabel: '📝 Pre-registro MX' },
       { id: 'a_v2', time: '22:15', name: 'MEX → NRT', notes: '✈️ Tramo largo hacia Tokio. Estar de vuelta en el aeropuerto 3 horas antes.' }
     ] 
   },
@@ -33,8 +33,8 @@ const initialItinerary = [
     id: 'd1', date: '15-may', region: 'Tokio', theme: 'blue', mainActivity: 'Ueno + Asakusa + Skytree', 
     routeQuery: 'saddr=Narita+International+Airport&daddr=Senso-ji+to:Tokyo+Skytree+to:Don+Quijote+Asakusa',
     activities: [
-      { id: 'a1', time: '06:30', name: 'Aterrizaje Narita (NRT)', notes: 'Pasar migración. Recoger Suica/Pasmo. 🚆 TRASLADO: Tren Keisei Skyliner hasta Ueno.' },
-      { id: 'a3', time: '13:00', name: 'Templo Senso-ji', notes: '⛩️ Recorrer Nakamise. 🛍️ Comprar el "Goshuincho" (Libro de sellos). Ver el Centro Turístico Asakusa (Mirador piso 8).' },
+      { id: 'a1', time: '06:30', name: 'Aterrizaje Narita (NRT)', notes: 'Pasar migración. Recoger Suica/Pasmo. 🚆 TRASLADO: Tren Keisei Skyliner hasta Ueno.', link: 'https://www.vjw.digital.go.jp/', linkLabel: '🛂 Visit Japan Web' },
+      { id: 'a3', time: '13:00', name: 'Templo Senso-ji', notes: '⛩️ Recorrer calle Nakamise. 🛍️ Comprar el "Goshuincho". Ver el Centro Turístico Asakusa (Mirador piso 8).' },
       { id: 'a4', time: '17:30', name: 'Tokyo Skytree', hours: '10:00 - 21:00', notes: '🎟️ Reserva obligatoria. Subir para el atardecer sobre la ciudad.' },
       { id: 'a5', time: '19:30', name: 'Don Quijote + Hobby Off', notes: '🛍️ Compras de snacks 24h y figuras de anime baratas.' }
     ] 
@@ -44,7 +44,7 @@ const initialItinerary = [
     routeQuery: 'saddr=Shibuya+Crossing&daddr=Shibuya+Sky+to:Odaiba+Gundam+Base+to:Tokyo+Station+to:Shin-Osaka+Station',
     activities: [
       { id: 'a5', time: '09:00', name: 'Shibuya Crossing', notes: 'Cruce peatonal famoso y foto con Hachiko.' },
-      { id: 'a5b', time: '10:30', name: 'Shibuya Sky', notes: '🎟️ RESERVA OBLIGATORIA (4 semanas antes).' },
+      { id: 'a5b', time: '10:30', name: 'Shibuya Sky', hours: '10:00 - 22:30', notes: '🎟️ RESERVA OBLIGATORIA (4 semanas antes).' },
       { id: 'a6', time: '14:00', name: 'Odaiba (Gundam Base)', notes: '🚆 Tren Yurikamome. Ver el Gundam Unicorn gigante y centro DiverCity.' },
       { id: 'a7', time: '18:30', name: 'Shinkansen a Osaka', notes: '🚆 Salida Estación Tokio. Comprar Eki-ben para cenar en el tren bala.' }
     ] 
@@ -62,25 +62,7 @@ const initialItinerary = [
     id: 'd4', date: '18-may', region: 'OSAKA (UNIVERSAL STUDIOS)', theme: 'emerald', mainActivity: 'Universal Studios Japan', 
     routeQuery: 'saddr=Namba+Station,+Osaka&daddr=Universal+Studios+Japan',
     activities: [
-      { id: 'a13', time: '08:00', name: 'Día en USJ', notes: '🚆 IDA: Línea JR Yumesaki desde Nishikujo. 🎟️ CONFIRMADO. 🚆 REGRESO: JR Yumesaki -> Nishikujo -> Namba.' }
-    ] 
-  },
-  { 
-    id: 'd5', date: '19-may', region: 'Nara', theme: 'emerald', mainActivity: 'Ciervos y Tradición', 
-    routeQuery: 'saddr=Namba+Station,+Osaka&daddr=Todai-ji,+Nara+to:Kasuga+Taisha+to:Naramachi',
-    activities: [
-      { id: 'a14', time: '09:30', name: 'Templo Todai-ji + Kasuga Taisha', notes: '🚆 IDA: Tren Kintetsu-Nara desde Namba. 🦌 Comprar galletas para ciervos.' },
-      { id: 'a14b', time: '15:00', name: 'Naramachi', notes: '🚶 Distrito antiguo. 🚆 REGRESO: Tren Kintetsu de vuelta a Osaka (40 min).' }
-    ] 
-  },
-  { 
-    id: 'd9', date: '23-may', region: 'Traslado Fuji → Tokio', theme: 'rose', mainActivity: 'Shibazakura + Omoide Yokocho', 
-    routeQuery: 'saddr=Shin-Osaka+Station&daddr=Mishima+Station+to:Fuji+Shibazakura+Festival+to:Omoide+Yokocho,+Shinjuku',
-    activities: [
-      { id: 'a25', time: '06:30', name: 'Salida Osaka → Mishima', notes: '🚆 Shinkansen Kodama muy temprano.' },
-      { id: 'a27', time: '11:00', name: 'Shibazakura Festival', notes: '🌸 Ver el Fuji con flores rosas. 🚌 TRASLADO: Bus local desde Mishima.' },
-      { id: 'a28', time: '16:00', name: 'Bus de Larga Distancia (Highway Bus)', notes: '🚌 Regreso directo a Shinjuku (Tokio). 🎟️ RESERVA PREVIA.' },
-      { id: 'a28b', time: '19:30', name: 'Omoide Yokocho (Shinjuku)', notes: '🍢 Cena en el callejón de los yakitoris.' }
+      { id: 'a13', time: '08:00', name: 'Día en USJ', notes: '🚆 IDA: Línea JR Yumesaki desde Nishikujo. 🚆 REGRESO: JR Yumesaki -> Nishikujo -> Namba/Osaka.' }
     ] 
   },
   { 
@@ -96,8 +78,8 @@ const initialItinerary = [
     id: 'd12', date: '26-may', region: 'Tokio', theme: 'blue', mainActivity: 'Ginza + Sanrio World + (teamLab)', 
     routeQuery: 'saddr=Ueno+Station&daddr=Sanrio+World+Ginza+to:teamLab+Planets+Tokyo',
     activities: [
-      { id: 'a33', time: '10:00', name: 'Sanrio World Ginza', notes: '🎀 La tienda de Sanrio más grande del mundo.' },
-      { id: 'a34', time: '14:00', name: 'teamLab Planets (OPCIONAL)', notes: '✨ Museo inmersivo en Toyosu. Queda muy cerca de Ginza.' }
+      { id: 'a33', time: '10:00', name: 'Sanrio World Ginza', notes: '🎀 La tienda de Sanrio más grande. Ideal para fans de Hello Kitty.' },
+      { id: 'a34', time: '14:00', name: 'teamLab Planets (OPCIONAL)', notes: '✨ Museo inmersivo en Toyosu. Ginza queda muy cerca, ideal para hoy.' }
     ] 
   },
   { 
@@ -116,7 +98,7 @@ const initialChecklist = [
   { id: 'c_h3', category: 'hospedaje', text: 'Hotel Tokio 2 (Ueno) - 23 al 25 Mayo (2 Noches, 5 Personas)', completed: true },
   { id: 'c_h4', category: 'hospedaje', text: 'Hotel Tokio 3 (Ueno) - 25 al 28 Mayo (3 Noches, 3 Personas)', completed: true },
   { id: 'c_t4', category: 'transporte', text: 'Tren Keisei Skyliner (Aeropuerto ↔ Tokio)', completed: false },
-  { id: 'c_t2', category: 'transporte', text: 'Bus de Larga Distancia (Highway Bus): Fuji → Shinjuku', completed: false }
+  { id: 'c_t2', category: 'transporte', text: 'Bus de Larga Distancia (Highway Bus)', completed: false }
 ];
 
 const themeStyles = {
@@ -126,7 +108,7 @@ const themeStyles = {
 };
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('resumen');
+  const [activeTab, setActiveTab] = useState('itinerario');
   const [itinerary, setItinerary] = useState(initialItinerary);
   const [checklist, setChecklist] = useState(initialChecklist);
   const [expandedDays, setExpandedDays] = useState([]);
@@ -178,25 +160,36 @@ export default function App() {
   return (
     <div className="min-h-screen touch-pan-y bg-slate-50/50 text-slate-800 font-sans pb-10">
       <div className="sticky top-0 z-20 bg-white border-b border-slate-200 shadow-sm pt-safe">
-        <div className="max-w-md mx-auto">
-          <div className="px-4 py-4 flex items-center justify-between">
-            <h1 className="text-xl font-black text-slate-800 tracking-tight italic underline decoration-amber-400">🎌 JAPAN 2026</h1>
-            <span className="text-[10px] font-bold px-2 py-1 bg-green-50 text-green-600 rounded-full border border-green-100">ONLINE ☁️</span>
-          </div>
-          <div className="flex px-2 pb-2 overflow-x-auto hide-scrollbar">
-            {[ { id: 'resumen', icon: Home, label: 'Info' }, { id: 'itinerario', icon: Map, label: 'Ruta' }, { id: 'mapa', icon: MapPin, label: 'Mapa' }, { id: 'reservas', icon: CheckSquare, label: 'Check' } ].map((item) => (
-              <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex-1 min-w-[75px] flex flex-col items-center justify-center gap-1 py-2.5 px-1 mx-1 rounded-2xl transition-all duration-300 ${activeTab === item.id ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:bg-slate-50'}`}>
-                <item.icon className="w-5 h-5" />
-                <span className="text-[9px] font-black uppercase tracking-widest">{item.label}</span>
-              </button>
-            ))}
-          </div>
+        <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
+          <h1 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2 italic underline decoration-amber-400">🎌 JAPAN 2026</h1>
+          <span className="text-[10px] font-bold px-2 py-1 bg-green-50 text-green-600 rounded-full border border-green-100 uppercase">ONLINE ☁️</span>
+        </div>
+        <div className="flex px-2 pb-2 overflow-x-auto hide-scrollbar">
+          {[ { id: 'resumen', icon: Home, label: 'Info' }, { id: 'itinerario', icon: Map, label: 'Ruta' }, { id: 'mapa', icon: MapPin, label: 'Mapa' }, { id: 'reservas', icon: CheckSquare, label: 'Check' } ].map((item) => (
+            <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex-1 min-w-[75px] flex flex-col items-center justify-center gap-1 py-2.5 px-1 mx-1 rounded-2xl transition-all duration-300 ${activeTab === item.id ? 'bg-slate-900 text-white shadow-xl scale-100' : 'text-slate-400 hover:bg-slate-50'}`}>
+              <item.icon className="w-5 h-5" />
+              <span className="text-[9px] font-black uppercase tracking-widest">{item.label}</span>
+            </button>
+          ))}
         </div>
       </div>
 
       <main className="max-w-md mx-auto p-4 mt-2">
         {activeTab === 'resumen' && (
           <div className="space-y-6 animate-in fade-in">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 text-center">
+                <Moon className="w-5 h-5 text-indigo-500 mb-2 mx-auto" />
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Noches</p>
+                <p className="text-lg font-black text-slate-800">13 (JP)</p>
+              </div>
+              <div className="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 text-center">
+                <Zap className="w-5 h-5 text-amber-500 mb-2 mx-auto" />
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Base</p>
+                <p className="text-lg font-black text-slate-800">TKY/OSK</p>
+              </div>
+            </div>
+
             <div className="bg-emerald-50 rounded-[32px] p-6 border border-emerald-100 shadow-sm">
                <h3 className="font-bold text-emerald-900 flex items-center gap-2 mb-3"><ShoppingBag className="w-5 h-5" /> Compras Expertas</h3>
                <ul className="text-xs text-emerald-800 space-y-3 font-medium">
@@ -207,7 +200,7 @@ export default function App() {
                </ul>
             </div>
             <div className="pt-4 flex justify-end">
-              <button onClick={forceUpdateCloud} className="p-2 text-slate-300 hover:text-slate-400 transition-colors"><CloudCog className="w-5 h-5" /></button>
+              <button onClick={forceUpdateCloud} className="p-2 text-slate-200 hover:text-slate-400 transition-colors"><CloudCog className="w-5 h-5" /></button>
             </div>
           </div>
         )}
@@ -216,7 +209,7 @@ export default function App() {
           <div className="space-y-4 pb-10">
             <div className="relative flex items-center mb-6 p-1 rounded-2xl border border-slate-200 bg-white shadow-sm">
               <Search className="w-4 h-4 ml-3 text-slate-400" />
-              <input type="text" placeholder="Buscar lugar (Skytree, USJ)..." className="w-full bg-transparent p-3 text-xs font-bold focus:outline-none" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+              <input type="text" placeholder="Buscar lugar..." className="w-full bg-transparent p-3 text-xs font-bold focus:outline-none" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
             </div>
 
             {filteredItinerary.map((day) => {
@@ -224,7 +217,7 @@ export default function App() {
               const isExpanded = expandedDays.includes(day.id) || searchTerm !== '';
               return (
                 <div key={day.id} className="mb-3">
-                  <button onClick={() => setExpandedDays(prev => isExpanded ? prev.filter(i => i !== day.id) : [...prev, day.id])} className={`w-full flex items-center justify-between p-4 rounded-[28px] border transition-all ${isExpanded ? 'bg-white shadow-xl' : theme.bg + ' ' + theme.border}`}>
+                  <button onClick={() => setExpandedDays(prev => isExpanded ? prev.filter(i => i !== day.id) : [...prev, day.id])} className={`w-full flex items-center justify-between p-4 rounded-[28px] border transition-all ${isExpanded ? 'bg-white shadow-xl border-slate-200' : theme.bg + ' ' + theme.border}`}>
                     <div className="flex items-center gap-3 text-left">
                       <div className={`px-4 py-1.5 rounded-full ${theme.iconBg} ${theme.iconText} text-[10px] font-black shadow-sm`}>{day.date}</div>
                       <div className="flex flex-col">
@@ -265,21 +258,22 @@ export default function App() {
             <div className="flex-1 rounded-[32px] overflow-hidden border border-slate-200 shadow-sm relative">
               <iframe title="Mapa" src={`https://maps.google.com/maps?${itinerary.find(d => d.id === selectedMapDay)?.routeQuery}&output=embed`} className="absolute inset-0 w-full h-full border-0" allowFullScreen="" loading="lazy"></iframe>
             </div>
-            <div className="bg-white p-4 rounded-[20px] text-center border border-slate-100 shadow-sm">
-              <p className="text-[12px] text-slate-800 font-black uppercase italic">{itinerary.find(d => d.id === selectedMapDay)?.mainActivity}</p>
+            <div className="bg-white p-4 rounded-[20px] text-center border border-slate-200 shadow-sm mt-2">
+              <p className="text-[12px] text-slate-800 font-black uppercase italic mb-1">{itinerary.find(d => d.id === selectedMapDay)?.mainActivity}</p>
+              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest italic">Desliza los botones arriba para cambiar de día</p>
             </div>
           </div>
         )}
 
         {activeTab === 'reservas' && (
           <div className="space-y-6 pb-24 animate-in fade-in">
-            {[ { cat: 'hospedaje', label: 'Hospedajes', icon: Building, color: 'text-indigo-600', bg: 'bg-indigo-50' }, { cat: 'transporte', label: 'Transportes', icon: Train, color: 'text-rose-600', bg: 'bg-rose-50' }, { cat: 'atraccion', label: 'Atracciones', icon: Ticket, color: 'text-emerald-600', bg: 'bg-emerald-50' } ].map((section) => (
+            {[ { cat: 'hospedaje', label: 'Hospedajes', icon: Building, color: 'text-indigo-600', bg: 'bg-indigo-50' }, { cat: 'transporte', label: 'Vuelos y Transportes', icon: Train, color: 'text-rose-600', bg: 'bg-rose-50' }, { cat: 'atraccion', label: 'Atracciones', icon: Ticket, color: 'text-emerald-600', bg: 'bg-emerald-50' } ].map((section) => (
               <div key={section.cat} className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-sm">
                 <div className="flex items-center gap-4 mb-8"><div className={`p-4 ${section.bg} ${section.color} rounded-[20px]`}><section.icon className="w-6 h-6" /></div><h3 className="font-black text-slate-900 text-xl uppercase tracking-tighter">{section.label}</h3></div>
                 <div className="space-y-3 text-left">
                   {checklist.filter(item => item.category === section.cat).map(item => (
                     <label key={item.id} className="flex items-center gap-4 p-4 hover:bg-slate-50 rounded-[24px] cursor-pointer transition-all border border-transparent hover:border-slate-100">
-                      <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-7 h-7 rounded-[10px] border-2 border-slate-200 text-slate-900 checked:bg-slate-900 transition-all" />
+                      <input type="checkbox" checked={item.completed} onChange={() => toggleCheck(item.id)} className="w-7 h-7 rounded-[10px] border-2 border-slate-200 text-slate-900 checked:bg-slate-900 transition-all cursor-pointer" />
                       <span className={`text-sm font-black tracking-tight ${item.completed ? 'text-slate-300 line-through decoration-[3px]' : 'text-slate-700'}`}>{item.text}</span>
                     </label>
                   ))}
