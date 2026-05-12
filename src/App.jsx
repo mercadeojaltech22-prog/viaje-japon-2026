@@ -76,6 +76,22 @@ const initialItinerary = [
       { id: 'a31b', time: '14:00', name: 'Nintendo Tokyo (Shibuya)', notes: '🕹️ Tienda oficial en Shibuya PARCO. A 5 min de Shimokitazawa.' },
       { id: 'a32', time: '20:00', name: 'Despedida Mauro y Julián', notes: '✈️ Salida de ellos al aeropuerto. El resto se muda al Hotel Tokio 3.' }
     ] 
+  },
+  { 
+    id: 'd12', date: '26-may', region: 'Tokio', theme: 'blue', mainActivity: 'Ginza + Sanrio World + (teamLab)', 
+    routeQuery: 'saddr=Ueno+Station&daddr=Sanrio+World+Ginza+to:teamLab+Planets+Tokyo',
+    activities: [
+      { id: 'a33', time: '10:00', name: 'Sanrio World Ginza', notes: '🛍️ La tienda más grande.' },
+      { id: 'a34', time: '14:00', name: 'teamLab Planets (OPCIONAL)', notes: '✨ Aprovechar la cercanía de Ginza con Toyosu.' }
+    ] 
+  },
+  { 
+    id: 'd13', date: '27-may', region: 'Tokio', theme: 'blue', mainActivity: 'Tokorozawa Sakura Town + (teamLab)', 
+    routeQuery: 'saddr=Ueno+Station&daddr=Tokorozawa+Sakura+Town+to:Azabudai+Hills',
+    activities: [
+      { id: 'a35', time: '10:00', name: 'Higashi-Tokorozawa / Sakura Town', notes: '🌸 Visita al Museo Kadokawa Culture.' },
+      { id: 'a36', time: '16:00', name: 'teamLab Borderless (OPCIONAL)', notes: '✨ En Azabudai Hills, por si prefieren este en lugar del Planets.' }
+    ] 
   }
 ];
 
@@ -85,7 +101,10 @@ const initialChecklist = [
   { id: 'c_h3', category: 'hospedaje', text: 'Hotel Tokio 2 (Ueno) - 23 al 25 Mayo (2 Noches, 5 Personas)', completed: true },
   { id: 'c_h4', category: 'hospedaje', text: 'Hotel Tokio 3 (Ueno) - 25 al 28 Mayo (3 Noches, 3 Personas)', completed: true },
   { id: 'c_t4', category: 'transporte', text: 'Tren Keisei Skyliner (Aeropuerto ↔ Tokio)', completed: false },
-  { id: 'c_t2', category: 'transporte', text: 'Bus de Larga Distancia (Highway Bus): Fuji → Shinjuku', completed: false }
+  { id: 'c_t2', category: 'transporte', text: 'Bus de Larga Distancia (Highway Bus): Fuji → Shinjuku', completed: false },
+  { id: 'c_a7', category: 'atraccion', text: 'Sanrio World Ginza', completed: false },
+  { id: 'c_a8', category: 'atraccion', text: 'Tokorozawa Sakura Town', completed: false },
+  { id: 'c_a9', category: 'atraccion', text: 'teamLab (Planets o Borderless) - Reserva obligatoria 4 semanas antes', completed: false }
 ];
 
 const themeStyles = {
