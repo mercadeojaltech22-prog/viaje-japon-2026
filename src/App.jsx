@@ -136,10 +136,11 @@ const initialItinerary = [
   },
   { 
     id: 'd11', date: '25-may', region: 'TOKIO', theme: 'blue', mainActivity: 'DÍA LIBRE y Despedida', 
-    routeQuery: 'saddr=Nakano+Broadway&daddr=Shimokitazawa,+Tokyo+to:Ueno+Station',
+    routeQuery: 'saddr=Nakano+Broadway&daddr=Shimokitazawa,+Tokyo+to:Fuji+Television+Network+to:Ueno+Station',
     activities: [
       { id: 'a31', time: '10:00', name: 'Shopping Libre', notes: '🛍️ Para perderse comprando: Nakano Broadway (Anime barato) o Shimokitazawa (Ropa vintage).' },
-      { id: 'a32', time: '20:00', name: 'Despedida', notes: '✈️ Salida de parte del grupo al aeropuerto. Reubicación en el Hotel Tokio 3 (Ueno).' }
+      { id: 'a31b', time: '14:00', name: 'Edificio Fuji TV (Odaiba)', notes: '🏢 Mirador esférico Hachitama (planta 25) y tiendas de merchandising de One Piece y Dragon Ball.' },
+      { id: 'a32', time: '20:00', name: 'Despedida', notes: '✈️ Salida de Mauro y Julián al aeropuerto.' }
     ] 
   },
   { 
@@ -164,7 +165,7 @@ const initialItinerary = [
     activities: [
       { id: 'a37', time: '09:00', name: 'Compras última hora en Ueno', notes: '🛍️ Aprovechar la mañana.' },
       { id: 'a38', time: '16:00', name: 'Tren Keisei Skyliner', notes: '🚆 Traslado a Narita (NRT). Vuelo a Seúl.' },
-      { id: 'a39', time: '23:30', name: 'Escala nocturna en Seúl', notes: '🇰🇷 ⏱️ ESCALA NOCTURNA. Dormir en el aeropuerto o salir a la ciudad.', link: 'https://www.k-eta.go.kr/', linkLabel: '🇰🇷 Tramitar K-ETA' }
+      { id: 'a39', time: '23:30', name: 'Escala nocturna en Seúl', notes: '🇰🇷 ⏱️ ESCALA NOCTURNA. Dormir en el aeropuerto o salir a la ciudad. ⚠️ RECOMENDACIÓN: En caso de salir del aeropuerto, se debe estar de regreso 3 horas antes del vuelo ICN → MEX debido al tamaño y flujo de seguridad de Incheon.', link: 'https://www.k-eta.go.kr/', linkLabel: '🇰🇷 Registro K-ETA' }
     ] 
   },
   { 
